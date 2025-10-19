@@ -1,0 +1,758 @@
+/* CoderEmbassy Express Checkout Frontend Styles */
+
+.coderembassy-express-checkout {
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    position: relative;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.coderembassy-products-grid {
+    display: grid;
+    margin-bottom: 30px;
+    /* Grid settings are now controlled via inline styles from admin panel */
+}
+
+.coderembassy-product-item {
+    position: relative;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 15px;
+    background: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+}
+
+/* Quick cart enabled - make product items clickable */
+.coderembassy-express-checkout[data-quick-cart="1"] .coderembassy-product-item {
+    cursor: pointer;
+}
+
+/* Hide add to cart button when quick cart is enabled */
+.coderembassy-express-checkout[data-quick-cart="1"] .coderembassy-actions {
+    display: none;
+}
+
+/* Product title link styles */
+.coderembassy-product-title a {
+    color: inherit;
+    text-decoration: none !important;
+    transition: color 0.3s ease;
+}
+
+.coderembassy-product-title a:hover {
+    color: #007cba;
+    text-decoration: underline;
+}
+
+/* Product variations styles */
+.coderembassy-product-variations {
+    margin-top: 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid #e9ecef;
+    border-top: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    right: -1px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.coderembassy-product-item:hover .coderembassy-product-variations {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Ensure variations don't interfere with other product items */
+.coderembassy-product-item.has-variations:hover {
+    z-index: 20;
+    transform: translateY(-2px) scale(1.02);
+}
+
+.coderembassy-variation-group {
+    margin-bottom: 8px;
+}
+
+.coderembassy-variation-group:last-child {
+    margin-bottom: 0;
+}
+
+.coderembassy-variation-label {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    color: #495057;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.coderembassy-variation-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.coderembassy-variation-option {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0;
+}
+
+.coderembassy-variation-option input[type="radio"] {
+    display: none;
+}
+
+/* Ensure variation radio buttons are enabled */
+.coderembassy-variation-option input[type="radio"]:not([disabled]) {
+    display: none !important;
+}
+
+.coderembassy-variation-option input[type="radio"][disabled] {
+    display: none !important;
+}
+
+.coderembassy-variation-option span {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #495057;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.coderembassy-variation-option input[type="radio"]:checked + span {
+    background-color: #007cba;
+    color: #fff;
+    border-color: #007cba;
+}
+
+.coderembassy-variation-option:hover span {
+    border-color: #007cba;
+    color: #007cba;
+}
+
+/* Variation selection notice removed */
+
+/* Disabled state for products with incomplete variations */
+.coderembassy-product-item.variation-incomplete .coderembassy-product-checkbox input {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Variation indicator for products with variations */
+.coderembassy-product-item.has-variations::after {
+    content: "⚙";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 12px;
+    color: #6c757d;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.coderembassy-product-item.has-variations:hover::after {
+    opacity: 1;
+    color: #007cba;
+}
+
+.coderembassy-product-item:hover {
+    border-color: #007cba;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Quick cart visual feedback */
+.coderembassy-product-item.quick-cart-added {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(46, 182, 80, 0.3);
+    border: 2px solid #2eb650;
+    animation: quickCartPulse 0.6s ease-out;
+}
+
+@keyframes quickCartPulse {
+    0% { 
+        transform: scale(1); 
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    50% { 
+        transform: scale(1.05); 
+        box-shadow: 0 4px 20px rgba(46, 182, 80, 0.4);
+    }
+    100% { 
+        transform: scale(1); 
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.coderembassy-product-item.selected {
+    border-color: #007cba;
+    background-color: #f0f8ff;
+}
+
+/* Auto-selected state for products with complete variations */
+.coderembassy-product-item.auto-selected {
+    border-color: #28a745;
+    background-color: #f8fff9;
+    animation: autoSelectPulse 0.6s ease-out;
+}
+
+@keyframes autoSelectPulse {
+    0% { 
+        transform: scale(1); 
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    50% { 
+        transform: scale(1.02); 
+        box-shadow: 0 4px 16px rgba(40, 167, 69, 0.3);
+    }
+    100% { 
+        transform: scale(1); 
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.coderembassy-product-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.coderembassy-product-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    z-index: 2;
+}
+
+.coderembassy-product-checkbox label {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.coderembassy-product-checkbox input[type="checkbox"]:checked + label {
+    background: #007cba;
+    border-color: #007cba;
+}
+
+.coderembassy-product-checkbox input[type="checkbox"]:checked + label::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Radio button styles */
+.coderembassy-product-checkbox input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    z-index: 2;
+}
+
+.coderembassy-product-checkbox input[type="radio"] + label {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.coderembassy-product-checkbox input[type="radio"]:checked + label {
+    background: #007cba;
+    border-color: #007cba;
+}
+
+.coderembassy-product-checkbox input[type="radio"]:checked + label::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.coderembassy-product-image {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.coderembassy-product-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.coderembassy-product-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.coderembassy-product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #007cba;
+    margin-bottom: 10px;
+}
+
+.coderembassy-product-sale-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff6b6b;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 5;
+}
+
+.coderembassy-actions {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+    padding: 0;
+    border: none;
+    margin: 0;
+}
+
+.coderembassy-add-to-cart-btn {
+    background: #007cba;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.coderembassy-add-to-cart-btn:hover {
+    background: #005a87;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+}
+
+.coderembassy-add-to-cart-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.coderembassy-loading {
+    color: #666;
+    font-style: italic;
+    margin-left: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .coderembassy-products-grid {
+        /* Only override gap on mobile, let grid-template-columns be controlled by admin settings */
+        gap: 15px !important;
+    }
+    
+    .coderembassy-product-item {
+        padding: 12px;
+    }
+    
+    .coderembassy-add-to-cart-btn {
+        padding: 10px 25px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .coderembassy-products-grid {
+        /* Force single column on very small screens for better mobile UX */
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    .coderembassy-product-item {
+        padding: 10px;
+    }
+}
+
+/* Animation for quick cart */
+.coderembassy-product-item.quick-cart-added {
+    animation: quickCartPulse 0.6s ease-in-out;
+}
+
+@keyframes quickCartPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); background-color: #e8f5e8; }
+    100% { transform: scale(1); }
+}
+
+/* Success and Error Messages - Now handled by popup notification system */
+
+/* Checkout Section */
+.coderembassy-checkout-section {
+    margin: 30px 0;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.coderembassy-checkout-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.coderembassy-checkout-header h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.coderembassy-checkout-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.coderembassy-empty-cart {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px dashed #dee2e6;
+}
+
+
+.coderembassy-checkout-form {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+}
+
+.coderembassy-checkout-form h4 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* AJAX Loading and Message Styles */
+.coderembassy-loading {
+    display: inline-block;
+    margin-left: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Old message styles removed - now using popup notification system */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* AJAX Button States */
+.coderembassy-add-to-cart-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #6c757d !important;
+}
+
+.coderembassy-add-to-cart-btn:disabled:hover {
+    background-color: #6c757d !important;
+    transform: none;
+}
+
+/* Popup Notification Styles */
+#coderembassy-notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999999;
+    pointer-events: none;
+}
+
+.coderembassy-notification {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+    max-width: 400px;
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    border-left: 4px solid #ddd;
+}
+
+.coderembassy-notification-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.coderembassy-notification-success {
+    border-left-color: #46b450;
+}
+
+.coderembassy-notification-error {
+    border-left-color: #dc3232;
+}
+
+.coderembassy-notification-info {
+    border-left-color: #00a0d2;
+}
+
+.coderembassy-notification-content {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    position: relative;
+}
+
+.coderembassy-notification-icon {
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.coderembassy-notification-icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+}
+
+.coderembassy-notification-success .coderembassy-notification-icon .dashicons {
+    color: #46b450;
+}
+
+.coderembassy-notification-error .coderembassy-notification-icon .dashicons {
+    color: #dc3232;
+}
+
+.coderembassy-notification-info .coderembassy-notification-icon .dashicons {
+    color: #00a0d2;
+}
+
+.coderembassy-notification-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    font-weight: 500;
+}
+
+.coderembassy-notification-close {
+    margin-left: 12px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.coderembassy-notification-close:hover {
+    background-color: #f0f0f1;
+}
+
+.coderembassy-notification-close .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+    color: #666;
+}
+
+/* Animation for multiple notifications */
+.coderembassy-notification:not(.coderembassy-notification-show) {
+    margin-bottom: 0;
+    transform: translateX(100%) scale(0.8);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #coderembassy-notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .coderembassy-notification {
+        max-width: none;
+        min-width: auto;
+    }
+}
+
+/* WooCommerce Checkout Form Styling */
+.coderembassy-checkout-form .woocommerce-checkout {
+    margin: 0;
+}
+
+/* Checkout Loading and Error Messages */
+.coderembassy-checkout-loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+.coderembassy-checkout-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px 16px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.coderembassy-checkout-notice {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    padding: 12px 16px;
+    border: 1px solid #bee5eb;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.coderembassy-checkout-form .woocommerce-billing-fields,
+.coderembassy-checkout-form .woocommerce-shipping-fields,
+.coderembassy-checkout-form .woocommerce-additional-fields,
+.coderembassy-checkout-form .woocommerce-checkout-review-order {
+    margin-bottom: 30px;
+}
+
+.coderembassy-checkout-form .woocommerce-billing-fields h3,
+.coderembassy-checkout-form .woocommerce-shipping-fields h3,
+.coderembassy-checkout-form .woocommerce-additional-fields h3,
+.coderembassy-checkout-form .woocommerce-checkout-review-order h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 2px solid #e1e5e9;
+    padding-bottom: 8px;
+}
+
+.coderembassy-checkout-form .form-row {
+    margin-bottom: 15px;
+}
+
+.coderembassy-checkout-form .form-row label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.coderembassy-checkout-form .form-row input,
+.coderembassy-checkout-form .form-row select,
+.coderembassy-checkout-form .form-row textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.coderembassy-checkout-form .form-row input:focus,
+.coderembassy-checkout-form .form-row select:focus,
+.coderembassy-checkout-form .form-row textarea:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+}
+
+.coderembassy-checkout-form .woocommerce-checkout-payment {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #e1e5e9;
+}
+
+.coderembassy-checkout-form .place-order {
+    margin-top: 20px;
+}
+
+.coderembassy-checkout-form .place-order .button {
+    background: #007cba;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.coderembassy-checkout-form .place-order .button:hover {
+    background: #005a87;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+}
