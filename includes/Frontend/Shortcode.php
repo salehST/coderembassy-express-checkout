@@ -134,13 +134,20 @@ class Shortcode {
             // Only show notification if AJAX is disabled (non-AJAX form submission)
             $ajax_cart = get_post_meta($post->ID, '_coderembassy_ajax_cart', true);
             if ($ajax_cart !== '1') {
-                echo '<script type="text/javascript">
+
+                $success_message = esc_js(sanitize_text_field($_SESSION['coderembassy_success_message']));
+                wp_enqueue_script('jquery');
+
+                 $inline_script = '
                     jQuery(document).ready(function($) {
                         if (typeof showSuccessNotification === "function") {
-                            showSuccessNotification("' . esc_js(sanitize_text_field($_SESSION['coderembassy_success_message'])) . '");
+                            showSuccessNotification("' . $success_message . '");
                         }
                     });
-                </script>';
+                ';
+                
+                wp_add_inline_script('jquery', $inline_script);
+               
             }
             unset($_SESSION['coderembassy_success_message']);
         }
