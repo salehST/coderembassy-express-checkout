@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: CoderEmbassy Express Checkout
- * Plugin URI: https://coderembassy.com/coderembassy-express-checkout/
+ * Plugin URI: https://coderembassy.com/coderembassy-express-checkout
  * Description: A shortcode-based WooCommerce plugin for express checkout with customizable product selection.
  * Version: 1.0.0
  * Author: codersaleh
- * Author URI: https://coderembassy.com/
+ * Author URI: https://coderembassy.com
  * Text Domain: coderembassy-express-checkout
  * Requires at least: 5.0
  * Tested up to: 6.8
