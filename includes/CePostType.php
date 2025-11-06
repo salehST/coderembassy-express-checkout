@@ -60,7 +60,7 @@ class CePostType {
             'show_in_rest' => false,
         );
         
-        register_post_type('ce_shortcode', $args);
+        register_post_type('coderembassy_shortcode', $args);
     }
     
     /**
@@ -74,7 +74,7 @@ class CePostType {
             'coderembassy_shortcode_shortcode',
             esc_html__('Shortcode', 'coderembassy-express-checkout'),
             array($this, 'shortcode_meta_box'),
-            'ce_shortcode',
+            'coderembassy_shortcode',
             'normal',
             'default'
         );
@@ -84,7 +84,7 @@ class CePostType {
             'coderembassy_checkout_modification',
             esc_html__('Checkout Modification', 'coderembassy-express-checkout'),
             array($this, 'checkout_modification_meta_box'),
-            'ce_shortcode',
+            'coderembassy_shortcode',
             'normal',
             'high'
         );
