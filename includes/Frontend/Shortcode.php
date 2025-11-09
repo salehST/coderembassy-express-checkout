@@ -129,18 +129,13 @@ class Shortcode {
         
         ob_start();
         
-        // Display success message if form was submitted (only for non-AJAX mode)
+        // Store success message in data attribute if form was submitted (only for non-AJAX mode)
+        $success_message = '';
         if (session_id() && isset($_SESSION['coderembassy_success_message'])) {
             // Only show notification if AJAX is disabled (non-AJAX form submission)
-            $ajax_cart = get_post_meta($post->ID, '_coderembassy_ajax_cart', true);
+            $ajax_cart = get_post_meta($post_id, '_coderembassy_ajax_cart', true);
             if ($ajax_cart !== '1') {
-                echo '<script type="text/javascript">
-                    jQuery(document).ready(function($) {
-                        if (typeof showSuccessNotification === "function") {
-                            showSuccessNotification("' . esc_js(sanitize_text_field($_SESSION['coderembassy_success_message'])) . '");
-                        }
-                    });
-                </script>';
+                $success_message = sanitize_text_field($_SESSION['coderembassy_success_message']);
             }
             unset($_SESSION['coderembassy_success_message']);
         }
@@ -160,6 +155,7 @@ class Shortcode {
              data-shortcode-id="<?php echo esc_attr($post_id); ?>" 
              data-ajax-cart="<?php echo esc_attr($ajax_add_to_cart); ?>" 
              data-quick-cart="<?php echo esc_attr($quick_cart); ?>"
+             <?php if (!empty($success_message)): ?>data-success-message="<?php echo esc_attr($success_message); ?>"<?php endif; ?>
              style="border-color: <?php echo esc_attr($container_border_color); ?>; background-color: <?php echo esc_attr($container_background_color); ?>; padding: <?php echo esc_attr($container_padding); ?>;">
             <div class="coderembassy-products-grid" style="grid-template-columns: <?php echo esc_attr($grid_template_columns); ?>; gap: <?php echo esc_attr($grid_gap); ?>;">
                 <?php foreach ($selected_products as $product_id): ?>

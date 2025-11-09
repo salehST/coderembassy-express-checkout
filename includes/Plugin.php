@@ -118,6 +118,20 @@ class Plugin {
                 'error' => esc_html__('An error occurred. Please try again.', 'coderembassy-express-checkout'),
             )
         ));
+        
+        // Add inline script to handle success messages from data attributes
+        $inline_script = "
+            jQuery(document).ready(function($) {
+                $('.coderembassy-express-checkout').each(function() {
+                    var \$container = $(this);
+                    var successMessage = \$container.data('success-message');
+                    if (successMessage && typeof showSuccessNotification === 'function') {
+                        showSuccessNotification(successMessage);
+                    }
+                });
+            });
+        ";
+        wp_add_inline_script('coderembassy-express-checkout-frontend', $inline_script);
     }
     
     /**
