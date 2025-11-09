@@ -209,6 +209,7 @@ class Plugin {
         // Localize admin script
         wp_localize_script('coderembassy-express-checkout-admin', 'coderembassyAdminData', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('coderembassy_admin_nonce'),
             'i18n' => array(
                 'searchProducts' => esc_html__('Type at least 3 characters to search products...', 'coderembassy-express-checkout'),
                 'noProductsFound' => esc_html__('No products found', 'coderembassy-express-checkout'),

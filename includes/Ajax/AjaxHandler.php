@@ -162,46 +162,84 @@ class AjaxHandler {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function search_products() {
+        // Check user capabilities
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array(
+                'message' => esc_html__('You do not have permission to perform this action.', 'coderembassy-express-checkout')
+            ));
+        }
 
-        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
-        if (!wp_verify_nonce($nonce, 'coderembassy_express_checkout_nonce')) {
+        // Get nonce from POST or GET (Select2 sends as GET)
+        $nonce = '';
+        if (isset($_REQUEST['nonce'])) {
+            $nonce = sanitize_text_field(wp_unslash($_REQUEST['nonce']));
+        }
+        
+        if (empty($nonce) || !wp_verify_nonce($nonce, 'coderembassy_admin_nonce')) {
             wp_send_json_error(array(
                 'message' => esc_html__('Security check failed.', 'coderembassy-express-checkout')
             ));
         }
         
-        $search_term = isset($_POST['search']) ? sanitize_text_field(wp_unslash($_POST['search'])) : '';
-        $page = isset($_POST['page']) ? intval(wp_unslash($_POST['page'])) : 1;
+        // Get search term from POST or GET (Select2 sends as GET)
+        $search_term = '';
+        if (isset($_REQUEST['search'])) {
+            $search_term = sanitize_text_field(wp_unslash($_REQUEST['search']));
+        }
+        
+        $page = 1;
+        if (isset($_REQUEST['page'])) {
+            $page = intval(wp_unslash($_REQUEST['page']));
+        }
+        
         $per_page = 20;
         
-        $args = array(
+        // Only search if term is at least 3 characters (matching minimumInputLength in Select2)
+        if (empty($search_term) || strlen(trim($search_term)) < 3) {
+            // If no search term or less than 3 characters, return empty results
+            wp_send_json_success(array(
+                'results' => array(),
+                'pagination' => array(
+                    'more' => false
+                )
+            ));
+        }
+        
+        // Use WP_Query for better search functionality
+        $query_args = array(
             'post_type' => 'product',
             'post_status' => 'publish',
             'posts_per_page' => $per_page,
-            'paged' => $page
+            'paged' => $page,
+            'orderby' => 'title',
+            'order' => 'ASC',
+            's' => trim($search_term)
         );
         
-        if (!empty($search_term)) {
-            $args['s'] = $search_term;
-        }
-        
-        $products = get_posts($args);
+        $query = new \WP_Query($query_args);
         $results = array();
         
-        foreach ($products as $product_post) {
-            $product = wc_get_product($product_post->ID);
-            if ($product && $product->is_purchasable()) {
-                $results[] = array(
-                    'id' => $product->get_id(),
-                    'text' => $product->get_name()
-                );
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $product_id = get_the_ID();
+                $product = wc_get_product($product_id);
+                
+                // Double check it's a product and not a variation
+                if ($product && !$product->is_type('variation') && $product->is_purchasable()) {
+                    $results[] = array(
+                        'id' => $product_id,
+                        'text' => $product->get_name()
+                    );
+                }
             }
+            wp_reset_postdata();
         }
         
         wp_send_json_success(array(
             'results' => $results,
             'pagination' => array(
-                'more' => count($products) === $per_page
+                'more' => $query->max_num_pages > $page
             )
         ));
     }
