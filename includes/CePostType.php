@@ -15,12 +15,11 @@ class CePostType {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function __construct() {
-        
-        add_action('init', array($this, 'register_post_type'));
+        add_action('init', array($this, 'register_post_type'), 10);
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
         add_action('save_post', array($this, 'save_meta_boxes'));
-        add_filter('manage_ce_shortcode_posts_columns', array($this, 'add_columns'));
-        add_action('manage_ce_shortcode_posts_custom_column', array($this, 'custom_column_content'), 10, 2);
+        add_filter('manage_coderembassy_ec_posts_columns', array($this, 'add_columns'));
+        add_action('manage_coderembassy_ec_posts_custom_column', array($this, 'custom_column_content'), 10, 2);
     }
     
     /**
@@ -29,6 +28,32 @@ class CePostType {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function register_post_type() {
+        // Check if WooCommerce is active
+        if (!class_exists('WooCommerce')) {
+            return;
+        }
+        
+        // Unregister old post type if it exists (for migration from ce_shortcode)
+        if (post_type_exists('ce_shortcode')) {
+            global $wp_post_types;
+            if (isset($wp_post_types['ce_shortcode'])) {
+                unset($wp_post_types['ce_shortcode']);
+            }
+        }
+        
+        // Unregister old post type if it exists (for migration from coderembassy_shortcode)
+        if (post_type_exists('coderembassy_shortcode')) {
+            global $wp_post_types;
+            if (isset($wp_post_types['coderembassy_shortcode'])) {
+                unset($wp_post_types['coderembassy_shortcode']);
+            }
+        }
+        
+        // Don't register if already registered
+        if (post_type_exists('coderembassy_ec')) {
+            return;
+        }
+        
         $labels = array(
             'name' => esc_html__('Express Checkout', 'coderembassy-express-checkout'),
             'singular_name' => esc_html__('Express Checkout', 'coderembassy-express-checkout'),
@@ -49,9 +74,22 @@ class CePostType {
             'publicly_queryable' => false,
             'show_ui' => true,
             'show_in_menu' => true,
-            'query_var' => true,
+            'show_in_nav_menus' => false,
+            'show_in_admin_bar' => true,
+            'query_var' => false,
             'rewrite' => false,
             'capability_type' => 'post',
+            'capabilities' => array(
+                'edit_post' => 'edit_post',
+                'read_post' => 'read_post',
+                'delete_post' => 'delete_post',
+                'edit_posts' => 'edit_posts',
+                'edit_others_posts' => 'edit_others_posts',
+                'publish_posts' => 'publish_posts',
+                'read_private_posts' => 'read_private_posts',
+                'create_posts' => 'edit_posts',
+            ),
+            'map_meta_cap' => true,
             'has_archive' => false,
             'hierarchical' => false,
             'menu_position' => 56,
@@ -60,7 +98,7 @@ class CePostType {
             'show_in_rest' => false,
         );
         
-        register_post_type('ce_shortcode', $args);
+        register_post_type('coderembassy_ec', $args);
     }
     
     /**
@@ -69,12 +107,18 @@ class CePostType {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function add_meta_boxes() {
+        // Only add meta boxes for our custom post type
+        $screen = get_current_screen();
+        if (!$screen || $screen->post_type !== 'coderembassy_ec') {
+            return;
+        }
+        
         // Shortcode metabox at the top with highest priority
         add_meta_box(
             'coderembassy_shortcode_shortcode',
             esc_html__('Shortcode', 'coderembassy-express-checkout'),
             array($this, 'shortcode_meta_box'),
-            'ce_shortcode',
+            'coderembassy_ec',
             'normal',
             'default'
         );
@@ -84,7 +128,7 @@ class CePostType {
             'coderembassy_checkout_modification',
             esc_html__('Checkout Modification', 'coderembassy-express-checkout'),
             array($this, 'checkout_modification_meta_box'),
-            'ce_shortcode',
+            'coderembassy_ec',
             'normal',
             'high'
         );
@@ -96,7 +140,7 @@ class CePostType {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function checkout_modification_meta_box($post) {
-        wp_nonce_field('ce_shortcode_meta_box', 'ce_shortcode_meta_box_nonce');
+        wp_nonce_field('coderembassy_ec_meta_box', 'coderembassy_ec_meta_box_nonce');
         
         $selected_products = get_post_meta($post->ID, '_coderembassy_selected_products', true);
         $ajax_add_to_cart = get_post_meta($post->ID, '_coderembassy_ajax_add_to_cart', true);
@@ -321,7 +365,7 @@ class CePostType {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function settings_meta_box($post) {
-        wp_nonce_field('ce_shortcode_meta_box', 'ce_shortcode_meta_box_nonce');
+        wp_nonce_field('coderembassy_ec_meta_box', 'coderembassy_ec_meta_box_nonce');
         
         $selected_products = get_post_meta($post->ID, '_coderembassy_selected_products', true);
         $ajax_add_to_cart = get_post_meta($post->ID, '_coderembassy_ajax_add_to_cart', true);
@@ -441,7 +485,7 @@ class CePostType {
     public function shortcode_meta_box($post) {
         if ($post->post_status === 'publish') {
             $post_name = sanitize_title($post->post_title);
-            $shortcode = '[ce_checkout id="' . $post->ID . '" name="' . $post_name . '"]';
+            $shortcode = '[coderembassy_checkout id="' . $post->ID . '" name="' . $post_name . '"]';
             ?>
             <div class="coderembassy-shortcode-container">
                 <p><strong><?php esc_html_e('Use this shortcode to display the express checkout:', 'coderembassy-express-checkout'); ?></strong></p>
@@ -470,8 +514,13 @@ class CePostType {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function save_meta_boxes($post_id) {
-        if (!isset($_POST['ce_shortcode_meta_box_nonce']) || 
-            !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ce_shortcode_meta_box_nonce'])), 'ce_shortcode_meta_box')) {
+        // Check if this is the correct post type
+        if (get_post_type($post_id) !== 'coderembassy_ec') {
+            return;
+        }
+        
+        if (!isset($_POST['coderembassy_ec_meta_box_nonce']) || 
+            !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['coderembassy_ec_meta_box_nonce'])), 'coderembassy_ec_meta_box')) {
             return;
         }
         
@@ -571,7 +620,7 @@ class CePostType {
                 if (get_post_status($post_id) === 'publish') {
                     $post = get_post($post_id);
                     $post_name = sanitize_title($post->post_title);
-                    $shortcode = '[ce_checkout id="' . $post_id . '" name="' . $post_name . '"]';
+                    $shortcode = '[coderembassy_checkout id="' . $post_id . '" name="' . $post_name . '"]';
                     ?>
                     <div class="coderembassy-shortcode-display">
                         <div class="coderembassy-shortcode-content">

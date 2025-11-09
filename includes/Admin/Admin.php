@@ -26,7 +26,7 @@ class Admin {
      */
     public function add_admin_menu() {
         add_submenu_page(
-            'edit.php?post_type=ce_shortcode',
+            'edit.php?post_type=coderembassy_ec',
             esc_html__('Configuration', 'coderembassy-express-checkout'),
             esc_html__('Configuration', 'coderembassy-express-checkout'),
             'manage_options',

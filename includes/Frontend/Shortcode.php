@@ -15,8 +15,10 @@ class Shortcode {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function __construct() {
+        add_shortcode('coderembassy_checkout', array($this, 'render_shortcode'));
+        // Keep old shortcodes for backward compatibility
+        add_shortcode('ceec_checkout', array($this, 'render_shortcode'));
         add_shortcode('ce_checkout', array($this, 'render_shortcode'));
-        // Keep old shortcode for backward compatibility
         add_shortcode('coderembassy_express_checkout', array($this, 'render_shortcode'));
     }
     
@@ -29,19 +31,19 @@ class Shortcode {
         $atts = shortcode_atts(array(
             'id' => 0,
             'name' => '',
-        ), $atts, 'ce_checkout');
+        ), $atts, 'coderembassy_checkout');
         
         $post_id = intval($atts['id']);
         
         // If name is provided, try to find post by name as fallback
         if (!$post_id && !empty($atts['name'])) {
-            $post = get_page_by_path($atts['name'], OBJECT, 'ce_shortcode');
+            $post = get_page_by_path($atts['name'], OBJECT, 'coderembassy_ec');
             if ($post) {
                 $post_id = $post->ID;
             }
         }
         
-        if (!$post_id || get_post_type($post_id) !== 'ce_shortcode') {
+        if (!$post_id || get_post_type($post_id) !== 'coderembassy_ec') {
             return '<p>' . esc_html__('Invalid shortcode ID.', 'coderembassy-express-checkout') . '</p>';
         }
         

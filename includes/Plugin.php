@@ -87,7 +87,7 @@ class Plugin {
     public function enqueue_scripts() {
         // Only enqueue if we have shortcodes on the page
         global $post;
-        if (!$post || (!has_shortcode($post->post_content, 'ce_checkout') && !has_shortcode($post->post_content, 'coderembassy_express_checkout'))) {
+        if (!$post || (!has_shortcode($post->post_content, 'coderembassy_checkout') && !has_shortcode($post->post_content, 'ceec_checkout') && !has_shortcode($post->post_content, 'ce_checkout') && !has_shortcode($post->post_content, 'coderembassy_express_checkout'))) {
             return;
         }
         
@@ -147,7 +147,7 @@ class Plugin {
         $should_load = false;
         
         // Check if we're on our post type pages
-        if ($post_type === 'ce_shortcode') {
+        if ($post_type === 'coderembassy_ec') {
             $should_load = true;
         }
         
