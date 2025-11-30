@@ -67,6 +67,9 @@ class Plugin {
         new Admin\Admin();
         new Frontend\Shortcode();
         new Ajax\AjaxHandler();
+        
+        // Allow pro version to hook into plugin initialization
+        do_action('coderembassy_express_checkout_init');
     }
     
     

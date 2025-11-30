@@ -255,34 +255,61 @@ class Shortcode {
         
         <?php if ($show_checkout_section === 'yes'): ?>
         <!-- WooCommerce Checkout Section -->
-        <div class="coderembassy-checkout-section">
-            <div class="coderembassy-checkout-header">
-                <h3><?php esc_html_e('Complete Your Order', 'coderembassy-express-checkout'); ?></h3>
-                <p><?php esc_html_e('Fill in your details below to complete your purchase:', 'coderembassy-express-checkout'); ?></p>
-            </div>
-            
-            <div class="coderembassy-checkout-content">
+        <?php
+        // Allow pro version to override the entire checkout section
+        $checkout_section_html = apply_filters('coderembassy_express_checkout_section_html', '', $post_id);
+        
+        if (!empty($checkout_section_html)) {
+            echo wp_kses_post($checkout_section_html);
+        } else {
+            ?>
+            <div class="coderembassy-checkout-section">
                 <?php
-                // Check if WooCommerce cart has items
-                if (function_exists('WC') && WC() && WC()->cart && WC()->cart->is_empty()) {
-                    echo '<p class="coderembassy-empty-cart">' . esc_html__('Your cart is empty. Please add some products above.', 'coderembassy-express-checkout') . '</p>';
+                // Allow customization of checkout header
+                $checkout_header = apply_filters('coderembassy_express_checkout_header', '', $post_id);
+                if (!empty($checkout_header)) {
+                    echo wp_kses_post($checkout_header);
                 } else {
-                    // Display WooCommerce checkout form directly
-                    echo '<div class="coderembassy-checkout-form">';
-                    // echo '<h4>' . __('Complete Your Order', 'coderembassy-express-checkout') . '</h4>';
-                    
-                    // Render WooCommerce checkout form
-                    if (function_exists('woocommerce_checkout_form')) {
-                        woocommerce_checkout_form();
-                    } else {
-                        // Fallback: use WooCommerce checkout shortcode
-                        echo do_shortcode('[woocommerce_checkout]');
-                    }
-                    echo '</div>';
+                    ?>
+                    <div class="coderembassy-checkout-header">
+                        <h3><?php esc_html_e('Complete Your Order', 'coderembassy-express-checkout'); ?></h3>
+                        <p><?php esc_html_e('Fill in your details below to complete your purchase:', 'coderembassy-express-checkout'); ?></p>
+                    </div>
+                    <?php
                 }
                 ?>
+                
+                <div class="coderembassy-checkout-content">
+                    <?php
+                    // Check if WooCommerce cart has items
+                    if (function_exists('WC') && WC() && WC()->cart && WC()->cart->is_empty()) {
+                        echo '<p class="coderembassy-empty-cart">' . esc_html__('Your cart is empty. Please add some products above.', 'coderembassy-express-checkout') . '</p>';
+                    } else {
+                        // Allow pro version to override checkout form rendering
+                        $checkout_form_html = apply_filters('coderembassy_express_checkout_form_html', '', $post_id);
+                        
+                        if (!empty($checkout_form_html)) {
+                            echo wp_kses_post($checkout_form_html);
+                        } else {
+                            // Display WooCommerce checkout form directly
+                            echo '<div class="coderembassy-checkout-form">';
+                            
+                            // Render WooCommerce checkout form
+                            if (function_exists('woocommerce_checkout_form')) {
+                                woocommerce_checkout_form();
+                            } else {
+                                // Fallback: use WooCommerce checkout shortcode
+                                echo do_shortcode('[woocommerce_checkout]');
+                            }
+                            echo '</div>';
+                        }
+                    }
+                    ?>
+                </div>
             </div>
-        </div>
+            <?php
+        }
+        ?>
         <?php endif; ?>
         <?php
         return ob_get_clean();

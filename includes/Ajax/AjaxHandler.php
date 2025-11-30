@@ -384,12 +384,19 @@ class AjaxHandler {
         // Generate checkout form
         ob_start();
         
-        // Render WooCommerce checkout form
-        if (function_exists('woocommerce_checkout_form')) {
-            woocommerce_checkout_form();
+        // Allow pro version to override checkout form rendering
+        $checkout_form_html = apply_filters('coderembassy_express_checkout_ajax_form_html', '', null);
+        
+        if (!empty($checkout_form_html)) {
+            echo wp_kses_post($checkout_form_html);
         } else {
-            // Fallback: use WooCommerce checkout shortcode
-            echo do_shortcode('[woocommerce_checkout]');
+            // Render WooCommerce checkout form
+            if (function_exists('woocommerce_checkout_form')) {
+                woocommerce_checkout_form();
+            } else {
+                // Fallback: use WooCommerce checkout shortcode
+                echo do_shortcode('[woocommerce_checkout]');
+            }
         }
         
         $checkout_form = ob_get_clean();
