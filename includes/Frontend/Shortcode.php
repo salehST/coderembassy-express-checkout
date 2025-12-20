@@ -260,7 +260,7 @@ class Shortcode {
         $checkout_section_html = apply_filters('coderembassy_express_checkout_section_html', '', $post_id);
         
         if (!empty($checkout_section_html)) {
-            echo wp_kses_post($checkout_section_html);
+            echo $checkout_section_html;
         } else {
             ?>
             <div class="coderembassy-checkout-section">
@@ -289,7 +289,7 @@ class Shortcode {
                         $checkout_form_html = apply_filters('coderembassy_express_checkout_form_html', '', $post_id);
                         
                         if (!empty($checkout_form_html)) {
-                            echo wp_kses_post($checkout_form_html);
+                            echo $checkout_form_html;
                         } else {
                             // Display WooCommerce checkout form directly
                             echo '<div class="coderembassy-checkout-form">';
