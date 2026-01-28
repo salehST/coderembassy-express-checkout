@@ -7,32 +7,35 @@ namespace CoderEmbassy\ExpressCheckout;
  * @since 1.0.0
  * @author Fazle Bari <fazlebarisn@gmail.com>
  */
-class CePostType {
-    
+class CePostType
+{
+
     /**
      * Constructor
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function __construct() {
+    public function __construct()
+    {
         add_action('init', array($this, 'register_post_type'), 10);
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
         add_action('save_post', array($this, 'save_meta_boxes'));
         add_filter('manage_coderembassy_ec_posts_columns', array($this, 'add_columns'));
         add_action('manage_coderembassy_ec_posts_custom_column', array($this, 'custom_column_content'), 10, 2);
     }
-    
+
     /**
      * Register custom post type
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function register_post_type() {
+    public function register_post_type()
+    {
         // Check if WooCommerce is active
         if (!class_exists('WooCommerce')) {
             return;
         }
-        
+
         // Unregister old post type if it exists (for migration from ce_shortcode)
         if (post_type_exists('ce_shortcode')) {
             global $wp_post_types;
@@ -40,7 +43,7 @@ class CePostType {
                 unset($wp_post_types['ce_shortcode']);
             }
         }
-        
+
         // Unregister old post type if it exists (for migration from coderembassy_shortcode)
         if (post_type_exists('coderembassy_shortcode')) {
             global $wp_post_types;
@@ -48,12 +51,12 @@ class CePostType {
                 unset($wp_post_types['coderembassy_shortcode']);
             }
         }
-        
+
         // Don't register if already registered
         if (post_type_exists('coderembassy_ec')) {
             return;
         }
-        
+
         $labels = array(
             'name' => esc_html__('Express Checkout', 'coderembassy-express-checkout'),
             'singular_name' => esc_html__('Express Checkout', 'coderembassy-express-checkout'),
@@ -67,7 +70,7 @@ class CePostType {
             'not_found' => esc_html__('No Express Checkout found', 'coderembassy-express-checkout'),
             'not_found_in_trash' => esc_html__('No Express Checkout found in trash', 'coderembassy-express-checkout'),
         );
-        
+
         $args = array(
             'labels' => $labels,
             'public' => false,
@@ -97,22 +100,23 @@ class CePostType {
             'supports' => array('title'),
             'show_in_rest' => false,
         );
-        
+
         register_post_type('coderembassy_ec', $args);
     }
-    
+
     /**
      * Add meta boxes
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function add_meta_boxes() {
+    public function add_meta_boxes()
+    {
         // Only add meta boxes for our custom post type
         $screen = get_current_screen();
         if (!$screen || $screen->post_type !== 'coderembassy_ec') {
             return;
         }
-        
+
         // Shortcode metabox at the top with highest priority
         add_meta_box(
             'coderembassy_shortcode_shortcode',
@@ -122,7 +126,7 @@ class CePostType {
             'normal',
             'default'
         );
-        
+
         // Single metabox for Settings and Design with tabs
         add_meta_box(
             'coderembassy_checkout_modification',
@@ -133,15 +137,16 @@ class CePostType {
             'high'
         );
     }
-    
+
     /**
      * Checkout Modification meta box with tabs
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function checkout_modification_meta_box($post) {
+    public function checkout_modification_meta_box($post)
+    {
         wp_nonce_field('coderembassy_ec_meta_box', 'coderembassy_ec_meta_box_nonce');
-        
+
         $selected_products = get_post_meta($post->ID, '_coderembassy_selected_products', true);
         $ajax_add_to_cart = get_post_meta($post->ID, '_coderembassy_ajax_add_to_cart', true);
         $quick_cart = get_post_meta($post->ID, '_coderembassy_quick_cart', true);
@@ -156,11 +161,11 @@ class CePostType {
         $container_background_color = get_post_meta($post->ID, '_coderembassy_container_background_color', true);
         $container_padding = get_post_meta($post->ID, '_coderembassy_container_padding', true);
         $show_checkout_section = get_post_meta($post->ID, '_coderembassy_show_checkout_section', true);
-        
+
         if (!is_array($selected_products)) {
             $selected_products = array();
         }
-        
+
         // Default values
         $product_width = $product_width ?: '200px';
         $product_height = $product_height ?: '300px';
@@ -172,8 +177,8 @@ class CePostType {
         $container_background_color = $container_background_color ?: '#f8f9fa';
         $container_padding = $container_padding ?: '20px';
         $show_checkout_section = $show_checkout_section ?: 'use_global';
-        
-        ?>
+
+?>
         <div class="coderembassy-checkout-modification">
             <div class="coderembassy-tab-nav">
                 <a href="#coderembassy-settings-tab" class="coderembassy-tab-link active" data-tab="settings">
@@ -183,7 +188,7 @@ class CePostType {
                     <?php esc_html_e('Design', 'coderembassy-express-checkout'); ?>
                 </a>
             </div>
-            
+
             <div class="coderembassy-tab-content-wrapper">
                 <div id="coderembassy-settings-tab" class="coderembassy-tab-content active">
                     <table class="form-table">
@@ -248,7 +253,7 @@ class CePostType {
                         </tr>
                     </table>
                 </div>
-                
+
                 <div id="coderembassy-design-tab" class="coderembassy-tab-content">
                     <table class="form-table">
                         <tr>
@@ -356,26 +361,27 @@ class CePostType {
                 </div>
             </div>
         </div>
-        <?php
+    <?php
     }
-    
+
     /**
      * Settings meta box (deprecated - kept for backward compatibility)
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function settings_meta_box($post) {
+    public function settings_meta_box($post)
+    {
         wp_nonce_field('coderembassy_ec_meta_box', 'coderembassy_ec_meta_box_nonce');
-        
+
         $selected_products = get_post_meta($post->ID, '_coderembassy_selected_products', true);
         $ajax_add_to_cart = get_post_meta($post->ID, '_coderembassy_ajax_add_to_cart', true);
         $quick_cart = get_post_meta($post->ID, '_coderembassy_quick_cart', true);
-        
+
         if (!is_array($selected_products)) {
             $selected_products = array();
         }
-        
-        ?>
+
+    ?>
         <table class="form-table">
             <tr>
                 <th scope="row">
@@ -416,27 +422,28 @@ class CePostType {
                 </td>
             </tr>
         </table>
-        <?php
+    <?php
     }
-    
+
     /**
      * Design meta box
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function design_meta_box($post) {
+    public function design_meta_box($post)
+    {
         $product_width = get_post_meta($post->ID, '_coderembassy_product_width', true);
         $product_height = get_post_meta($post->ID, '_coderembassy_product_height', true);
         $title_font_size = get_post_meta($post->ID, '_coderembassy_title_font_size', true);
         $title_color = get_post_meta($post->ID, '_coderembassy_title_color', true);
-        
+
         // Default values
         $product_width = $product_width ?: '200px';
         $product_height = $product_height ?: '300px';
         $title_font_size = $title_font_size ?: '16px';
         $title_color = $title_color ?: '#333333';
-        
-        ?>
+
+    ?>
         <table class="form-table">
             <tr>
                 <th scope="row">
@@ -476,17 +483,18 @@ class CePostType {
         </table>
         <?php
     }
-    
+
     /**
      * Shortcode meta box
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function shortcode_meta_box($post) {
+    public function shortcode_meta_box($post)
+    {
         if ($post->post_status === 'publish') {
             $post_name = sanitize_title($post->post_title);
             $shortcode = '[coderembassy_checkout id="' . $post->ID . '" name="' . $post_name . '"]';
-            ?>
+        ?>
             <div class="coderembassy-shortcode-container">
                 <p><strong><?php esc_html_e('Use this shortcode to display the express checkout:', 'coderembassy-express-checkout'); ?></strong></p>
                 <div class="coderembassy-shortcode-input-group">
@@ -497,9 +505,9 @@ class CePostType {
                 </div>
                 <p class="description"><?php esc_html_e('Click the input field to select all, or use the Copy button.', 'coderembassy-express-checkout'); ?></p>
             </div>
-            <?php
+        <?php
         } else {
-            ?>
+        ?>
             <div class="coderembassy-shortcode-container">
                 <p><strong><?php esc_html_e('Publish this shortcode to get the shortcode code.', 'coderembassy-express-checkout'); ?></strong></p>
                 <p class="description"><?php esc_html_e('Once published, you will see the shortcode here with a copy button.', 'coderembassy-express-checkout'); ?></p>
@@ -507,31 +515,34 @@ class CePostType {
             <?php
         }
     }
-    
+
     /**
      * Save meta boxes
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function save_meta_boxes($post_id) {
+    public function save_meta_boxes($post_id)
+    {
         // Check if this is the correct post type
         if (get_post_type($post_id) !== 'coderembassy_ec') {
             return;
         }
-        
-        if (!isset($_POST['coderembassy_ec_meta_box_nonce']) || 
-            !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['coderembassy_ec_meta_box_nonce'])), 'coderembassy_ec_meta_box')) {
+
+        if (
+            !isset($_POST['coderembassy_ec_meta_box_nonce']) ||
+            !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['coderembassy_ec_meta_box_nonce'])), 'coderembassy_ec_meta_box')
+        ) {
             return;
         }
-        
+
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
-        
+
         if (!current_user_can('edit_post', $post_id)) {
             return;
         }
-        
+
         // Save selected products
         if (isset($_POST['coderembassy_selected_products'])) {
             $selected_products = array_map('intval', $_POST['coderembassy_selected_products']);
@@ -539,89 +550,91 @@ class CePostType {
         } else {
             update_post_meta($post_id, '_coderembassy_selected_products', array());
         }
-        
+
         // Save AJAX add to cart (with override support)
         $ajax_add_to_cart = isset($_POST['coderembassy_ajax_add_to_cart']) ? sanitize_text_field(wp_unslash($_POST['coderembassy_ajax_add_to_cart'])) : 'global';
         update_post_meta($post_id, '_coderembassy_ajax_add_to_cart', $ajax_add_to_cart);
-        
+
         // Save quick cart (with override support)
         $quick_cart = isset($_POST['coderembassy_quick_cart']) ? sanitize_text_field(wp_unslash($_POST['coderembassy_quick_cart'])) : 'global';
         update_post_meta($post_id, '_coderembassy_quick_cart', $quick_cart);
-        
+
         // Save product select type (with override support)
         $product_select_type = isset($_POST['coderembassy_product_select_type']) ? sanitize_text_field(wp_unslash($_POST['coderembassy_product_select_type'])) : 'global';
         update_post_meta($post_id, '_coderembassy_product_select_type', $product_select_type);
-        
+
         // Save design options
         if (isset($_POST['coderembassy_product_width'])) {
             update_post_meta($post_id, '_coderembassy_product_width', sanitize_text_field(wp_unslash($_POST['coderembassy_product_width'])));
         }
-        
+
         if (isset($_POST['coderembassy_product_height'])) {
             update_post_meta($post_id, '_coderembassy_product_height', sanitize_text_field(wp_unslash($_POST['coderembassy_product_height'])));
         }
-        
+
         if (isset($_POST['coderembassy_title_font_size'])) {
             update_post_meta($post_id, '_coderembassy_title_font_size', sanitize_text_field(wp_unslash($_POST['coderembassy_title_font_size'])));
         }
-        
+
         if (isset($_POST['coderembassy_title_color'])) {
             update_post_meta($post_id, '_coderembassy_title_color', sanitize_hex_color(wp_unslash($_POST['coderembassy_title_color'])));
         }
-        
+
         if (isset($_POST['coderembassy_grid_columns'])) {
             update_post_meta($post_id, '_coderembassy_grid_columns', sanitize_text_field(wp_unslash($_POST['coderembassy_grid_columns'])));
         }
-        
+
         if (isset($_POST['coderembassy_grid_gap'])) {
             update_post_meta($post_id, '_coderembassy_grid_gap', sanitize_text_field(wp_unslash($_POST['coderembassy_grid_gap'])));
         }
-        
+
         if (isset($_POST['coderembassy_container_border_color'])) {
             update_post_meta($post_id, '_coderembassy_container_border_color', sanitize_hex_color(wp_unslash($_POST['coderembassy_container_border_color'])));
         }
-        
+
         if (isset($_POST['coderembassy_container_background_color'])) {
             update_post_meta($post_id, '_coderembassy_container_background_color', sanitize_hex_color(wp_unslash($_POST['coderembassy_container_background_color'])));
         }
-        
+
         if (isset($_POST['coderembassy_container_padding'])) {
             update_post_meta($post_id, '_coderembassy_container_padding', sanitize_text_field(wp_unslash($_POST['coderembassy_container_padding'])));
         }
-        
+
         if (isset($_POST['coderembassy_show_checkout_section'])) {
             update_post_meta($post_id, '_coderembassy_show_checkout_section', sanitize_text_field(wp_unslash($_POST['coderembassy_show_checkout_section'])));
         }
     }
-    
+
     /**
      * Add custom columns
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function add_columns($columns) {
+    public function add_columns($columns)
+    {
         $new_columns = array();
         $new_columns['cb'] = $columns['cb'];
         $new_columns['title'] = $columns['title'];
         $new_columns['shortcode'] = esc_html__('Shortcode', 'coderembassy-express-checkout');
         $new_columns['products_count'] = esc_html__('Products Count', 'coderembassy-express-checkout');
-        
+
         return $new_columns;
     }
-    
+
     /**
      * Custom column content
      * @since 1.0.0
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
-    public function custom_column_content($column, $post_id) {
+    public function custom_column_content($column, $post_id)
+    {
         switch ($column) {
             case 'shortcode':
                 if (get_post_status($post_id) === 'publish') {
                     $post = get_post($post_id);
                     $post_name = sanitize_title($post->post_title);
                     $shortcode = '[coderembassy_checkout id="' . $post_id . '" name="' . $post_name . '"]';
-                    ?>
+            ?>
                     <div class="coderembassy-shortcode-display">
                         <div class="coderembassy-shortcode-content">
                             <code class="coderembassy-shortcode-text"><?php echo esc_html($shortcode); ?></code>
@@ -630,12 +643,12 @@ class CePostType {
                             <span class="dashicons dashicons-clipboard"></span>
                         </button>
                     </div>
-                    <?php
+<?php
                 } else {
                     echo '<em>' . esc_html__('Not published', 'coderembassy-express-checkout') . '</em>';
                 }
                 break;
-                
+
             case 'products_count':
                 $selected_products = get_post_meta($post_id, '_coderembassy_selected_products', true);
                 if (is_array($selected_products)) {
