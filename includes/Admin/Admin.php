@@ -26,7 +26,7 @@ class Admin {
      */
     public function add_admin_menu() {
         add_submenu_page(
-            'edit.php?post_type=ce_shortcode',
+            'edit.php?post_type=coderembassy_ec',
             esc_html__('Configuration', 'coderembassy-express-checkout'),
             esc_html__('Configuration', 'coderembassy-express-checkout'),
             'manage_options',
@@ -71,6 +71,14 @@ class Admin {
             'coderembassy_default_product_select_type',
             esc_html__('Default Product Select Type', 'coderembassy-express-checkout'),
             array($this, 'product_select_type_callback'),
+            'coderembassy_configuration',
+            'coderembassy_general_section'
+        );
+        
+        add_settings_field(
+            'coderembassy_checkout_layout_style',
+            esc_html__('Checkout Layout Style', 'coderembassy-express-checkout'),
+            array($this, 'checkout_layout_style_callback'),
             'coderembassy_configuration',
             'coderembassy_general_section'
         );
@@ -126,6 +134,23 @@ class Admin {
             <option value="radio" <?php selected($value, 'radio'); ?>><?php esc_html_e('Radio Button (Single Selection)', 'coderembassy-express-checkout'); ?></option>
         </select>
         <p class="description"><?php esc_html_e('Choose how users can select products. Checkbox allows multiple selections, Radio button allows only one selection.', 'coderembassy-express-checkout'); ?></p>
+        <?php
+    }
+    
+    /**
+     * Checkout layout style callback
+     * @since 1.0.0
+     * @author Fazle Bari <fazlebarisn@gmail.com>
+     */
+    public function checkout_layout_style_callback() {
+        $options = get_option('coderembassy_global_options');
+        $value = isset($options['checkout_layout_style']) ? $options['checkout_layout_style'] : 'theme';
+        ?>
+        <select name="coderembassy_global_options[checkout_layout_style]">
+            <option value="theme" <?php selected($value, 'theme'); ?>><?php esc_html_e('Theme Layout (Default)', 'coderembassy-express-checkout'); ?></option>
+            <option value="custom" disabled><?php esc_html_e('Plugin Custom 2-Column Grid (PRO Feature)', 'coderembassy-express-checkout'); ?></option>
+        </select>
+        <p class="description"><?php esc_html_e('Theme Layout blends seamlessly with your current active theme (e.g. Elementor/WoodMart). The elegant 2-column Custom Grid layout is available in the PRO version.', 'coderembassy-express-checkout'); ?></p>
         <?php
     }
     
@@ -300,6 +325,11 @@ public function sanitize_global_options($input) {
         $sanitized['default_product_select_type'] = in_array($input['default_product_select_type'], $allowed_types, true) 
             ? $input['default_product_select_type'] 
             : 'checkbox';
+    }
+
+    if (isset($input['checkout_layout_style'])) {
+        // Free version only allows 'theme'
+        $sanitized['checkout_layout_style'] = 'theme';
     }
     
     return $sanitized;

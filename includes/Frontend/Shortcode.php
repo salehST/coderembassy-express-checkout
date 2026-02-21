@@ -15,8 +15,10 @@ class Shortcode {
      * @author Fazle Bari <fazlebarisn@gmail.com>
      */
     public function __construct() {
+        add_shortcode('coderembassy_checkout', array($this, 'render_shortcode'));
+        // Keep old shortcodes for backward compatibility
+        add_shortcode('ceec_checkout', array($this, 'render_shortcode'));
         add_shortcode('ce_checkout', array($this, 'render_shortcode'));
-        // Keep old shortcode for backward compatibility
         add_shortcode('coderembassy_express_checkout', array($this, 'render_shortcode'));
     }
     
@@ -29,19 +31,19 @@ class Shortcode {
         $atts = shortcode_atts(array(
             'id' => 0,
             'name' => '',
-        ), $atts, 'ce_checkout');
+        ), $atts, 'coderembassy_checkout');
         
         $post_id = intval($atts['id']);
         
         // If name is provided, try to find post by name as fallback
         if (!$post_id && !empty($atts['name'])) {
-            $post = get_page_by_path($atts['name'], OBJECT, 'ce_shortcode');
+            $post = get_page_by_path($atts['name'], OBJECT, 'coderembassy_ec');
             if ($post) {
                 $post_id = $post->ID;
             }
         }
         
-        if (!$post_id || get_post_type($post_id) !== 'ce_shortcode') {
+        if (!$post_id || get_post_type($post_id) !== 'coderembassy_ec') {
             return '<p>' . esc_html__('Invalid shortcode ID.', 'coderembassy-express-checkout') . '</p>';
         }
         
@@ -129,18 +131,13 @@ class Shortcode {
         
         ob_start();
         
-        // Display success message if form was submitted (only for non-AJAX mode)
+        // Store success message in data attribute if form was submitted (only for non-AJAX mode)
+        $success_message = '';
         if (session_id() && isset($_SESSION['coderembassy_success_message'])) {
             // Only show notification if AJAX is disabled (non-AJAX form submission)
-            $ajax_cart = get_post_meta($post->ID, '_coderembassy_ajax_cart', true);
+            $ajax_cart = get_post_meta($post_id, '_coderembassy_ajax_cart', true);
             if ($ajax_cart !== '1') {
-                echo '<script type="text/javascript">
-                    jQuery(document).ready(function($) {
-                        if (typeof showSuccessNotification === "function") {
-                            showSuccessNotification("' . esc_js(sanitize_text_field($_SESSION['coderembassy_success_message'])) . '");
-                        }
-                    });
-                </script>';
+                $success_message = sanitize_text_field($_SESSION['coderembassy_success_message']);
             }
             unset($_SESSION['coderembassy_success_message']);
         }
@@ -160,6 +157,7 @@ class Shortcode {
              data-shortcode-id="<?php echo esc_attr($post_id); ?>" 
              data-ajax-cart="<?php echo esc_attr($ajax_add_to_cart); ?>" 
              data-quick-cart="<?php echo esc_attr($quick_cart); ?>"
+             <?php if (!empty($success_message)): ?>data-success-message="<?php echo esc_attr($success_message); ?>"<?php endif; ?>
              style="border-color: <?php echo esc_attr($container_border_color); ?>; background-color: <?php echo esc_attr($container_background_color); ?>; padding: <?php echo esc_attr($container_padding); ?>;">
             <div class="coderembassy-products-grid" style="grid-template-columns: <?php echo esc_attr($grid_template_columns); ?>; gap: <?php echo esc_attr($grid_gap); ?>;">
                 <?php foreach ($selected_products as $product_id): ?>
@@ -169,7 +167,13 @@ class Shortcode {
                         continue;
                     }
                     ?>
-                    <div class="coderembassy-product-item<?php echo esc_attr($product->is_type('variable') ? ' has-variations' : ''); ?>" style="width: <?php echo esc_attr($product_width); ?>; height: <?php echo esc_attr($product_height); ?>;">
+                    <div class="coderembassy-product-item<?php echo esc_attr($product->is_type('variable') ? ' has-variations' : ''); ?>" style="width: <?php echo esc_attr($product_width); ?>;">
+                        <?php if ($product->is_on_sale()): ?>
+                            <div class="coderembassy-product-sale-badge">
+                                <?php esc_html_e('Sale!', 'coderembassy-express-checkout'); ?>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="coderembassy-product-checkbox">
                             <?php if ($product_select_type === 'radio'): ?>
                                 <input type="radio" 
@@ -190,21 +194,43 @@ class Shortcode {
                             <?php endif; ?>
                             <label for="coderembassy-product-<?php echo esc_attr($product_id); ?>"></label>
                         </div>
-                        
-                        <div class="coderembassy-product-image">
-                            <?php echo wp_kses_post($product->get_image('medium')); ?>
+
+                        <!-- Body: grows to fill card, keeps image + title together -->
+                        <div class="coderembassy-product-body">
+                            <div class="coderembassy-product-image">
+                                <?php echo wp_kses_post($product->get_image('medium')); ?>
+                            </div>
+
+                            <div class="coderembassy-product-title" style="font-size: <?php echo esc_attr($title_font_size); ?>; color: <?php echo esc_attr($title_color); ?>;">
+                                <a href="<?php echo esc_url($product->get_permalink()); ?>" target="_blank">
+                                    <?php echo esc_html($product->get_name()); ?>
+                                </a>
+                            </div>
                         </div>
-                        
-                        <div class="coderembassy-product-title" style="font-size: <?php echo esc_attr($title_font_size); ?>; color: <?php echo esc_attr($title_color); ?>;">
-                            <a href="<?php echo esc_url($product->get_permalink()); ?>" target="_blank">
-                                <?php echo esc_html($product->get_name()); ?>
-                            </a>
+
+                        <!-- Footer: price + qty always anchored to bottom of card -->
+                        <div class="coderembassy-product-footer">
+                            <div class="coderembassy-product-price">
+                                <?php echo wp_kses_post($product->get_price_html()); ?>
+                            </div>
+
+                            <div class="coderembassy-product-quantity">
+                                <span class="coderembassy-qty-label"><?php esc_html_e('Qty:', 'coderembassy-express-checkout'); ?></span>
+                                <div class="coderembassy-qty-controls">
+                                    <button type="button" class="coderembassy-qty-btn coderembassy-qty-minus" aria-label="<?php esc_attr_e('Decrease quantity', 'coderembassy-express-checkout'); ?>">&#8722;</button>
+                                    <input type="number"
+                                           class="coderembassy-qty-input"
+                                           value="1"
+                                           min="1"
+                                           max="99"
+                                           step="1"
+                                           data-product-id="<?php echo esc_attr($product_id); ?>"
+                                           aria-label="<?php esc_attr_e('Quantity', 'coderembassy-express-checkout'); ?>" />
+                                    <button type="button" class="coderembassy-qty-btn coderembassy-qty-plus" aria-label="<?php esc_attr_e('Increase quantity', 'coderembassy-express-checkout'); ?>">&#43;</button>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="coderembassy-product-price">
-                            <?php echo wp_kses_post($product->get_price_html()); ?>
-                        </div>
-                        
+
                         <?php if ($product->is_type('variable')): ?>
                             <div class="coderembassy-product-variations" data-product-id="<?php echo esc_attr($product_id); ?>">
                                 <?php
@@ -237,13 +263,8 @@ class Shortcode {
                                 ?>
                             </div>
                         <?php endif; ?>
-                        
-                        <?php if ($product->is_on_sale()): ?>
-                            <div class="coderembassy-product-sale-badge">
-                                <?php esc_html_e('Sale!', 'coderembassy-express-checkout'); ?>
-                            </div>
-                        <?php endif; ?>
                     </div>
+
                 <?php endforeach; ?>
             </div>
             
@@ -257,34 +278,70 @@ class Shortcode {
         
         <?php if ($show_checkout_section === 'yes'): ?>
         <!-- WooCommerce Checkout Section -->
-        <div class="coderembassy-checkout-section">
-            <div class="coderembassy-checkout-header">
-                <h3><?php esc_html_e('Complete Your Order', 'coderembassy-express-checkout'); ?></h3>
-                <p><?php esc_html_e('Fill in your details below to complete your purchase:', 'coderembassy-express-checkout'); ?></p>
-            </div>
-            
-            <div class="coderembassy-checkout-content">
+        <?php
+        // Allow pro version to override the entire checkout section
+        $checkout_section_html = apply_filters('coderembassy_express_checkout_section_html', '', $post_id);
+        
+        if (!empty($checkout_section_html)) {
+            echo $checkout_section_html;
+        } else {
+            ?>
+            <div class="coderembassy-checkout-section">
                 <?php
-                // Check if WooCommerce cart has items
-                if (function_exists('WC') && WC() && WC()->cart && WC()->cart->is_empty()) {
-                    echo '<p class="coderembassy-empty-cart">' . esc_html__('Your cart is empty. Please add some products above.', 'coderembassy-express-checkout') . '</p>';
+                // Allow customization of checkout header
+                $checkout_header = apply_filters('coderembassy_express_checkout_header', '', $post_id);
+                if (!empty($checkout_header)) {
+                    echo wp_kses_post($checkout_header);
                 } else {
-                    // Display WooCommerce checkout form directly
-                    echo '<div class="coderembassy-checkout-form">';
-                    // echo '<h4>' . __('Complete Your Order', 'coderembassy-express-checkout') . '</h4>';
-                    
-                    // Render WooCommerce checkout form
-                    if (function_exists('woocommerce_checkout_form')) {
-                        woocommerce_checkout_form();
-                    } else {
-                        // Fallback: use WooCommerce checkout shortcode
-                        echo do_shortcode('[woocommerce_checkout]');
-                    }
-                    echo '</div>';
+                    ?>
+                    <div class="coderembassy-checkout-header">
+                        <h3><?php esc_html_e('Complete Your Order', 'coderembassy-express-checkout'); ?></h3>
+                        <p><?php esc_html_e('Fill in your details below to complete your purchase:', 'coderembassy-express-checkout'); ?></p>
+                    </div>
+                    <?php
                 }
                 ?>
+                
+                <div class="coderembassy-checkout-content">
+                    <?php
+                    // Check if WooCommerce cart has items
+                    if (function_exists('WC') && WC() && WC()->cart && WC()->cart->is_empty()) {
+                        echo '<p class="coderembassy-empty-cart">' . esc_html__('Your cart is empty. Please add some products above.', 'coderembassy-express-checkout') . '</p>';
+                    } else {
+                        // Allow pro version to override checkout form rendering
+                        $checkout_form_html = apply_filters('coderembassy_express_checkout_form_html', '', $post_id);
+                        
+                        if (!empty($checkout_form_html)) {
+                            echo $checkout_form_html;
+                        } else {
+                            // Check layout style preference
+                            $checkout_layout_style = isset($global_options['checkout_layout_style']) ? $global_options['checkout_layout_style'] : 'theme';
+                            
+                            // Display WooCommerce checkout form directly
+                            if ($checkout_layout_style === 'custom') {
+                                echo '<div class="coderembassy-checkout-form coderembassy-custom-layout">';
+                            } else {
+                                // Default Theme Layout: strictly raw output for native theme compatibility
+                                echo '<div class="coderembassy-checkout-form">';
+                            }
+                            
+                            // Render WooCommerce checkout form
+                            if (function_exists('woocommerce_checkout_form')) {
+                                woocommerce_checkout_form();
+                            } else {
+                                // Fallback: use WooCommerce checkout shortcode
+                                echo do_shortcode('[woocommerce_checkout]');
+                            }
+                            
+                            echo '</div>';
+                        }
+                    }
+                    ?>
+                </div>
             </div>
-        </div>
+            <?php
+        }
+        ?>
         <?php endif; ?>
         <?php
         return ob_get_clean();

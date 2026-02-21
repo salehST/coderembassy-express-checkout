@@ -50,6 +50,15 @@
             $container.find('.coderembassy-tab-content').removeClass('active');
             $container.find('#coderembassy-' + targetTab + '-tab').addClass('active');
             
+            // Reinitialize Select2 when switching to settings tab (where product selector is)
+            if (targetTab === 'settings') {
+                setTimeout(function() {
+                    if ($('#coderembassy_selected_products').length && !$('#coderembassy_selected_products').hasClass('select2-hidden-accessible')) {
+                        initProductSelector();
+                    }
+                }, 100);
+            }
+            
             // Save tab state
             saveTabState($container, targetTab);
         });
@@ -124,6 +133,11 @@
     }
 
     function initProductSelector() {
+        // Check if element exists
+        if (!$('#coderembassy_selected_products').length) {
+            return;
+        }
+        
         // Destroy existing Select2 if it exists
         if ($('#coderembassy_selected_products').hasClass('select2-hidden-accessible')) {
             $('#coderembassy_selected_products').select2('destroy');
@@ -133,12 +147,13 @@
         $('#coderembassy_selected_products').select2({
             ajax: {
                 url: coderembassyAdminData.ajaxUrl,
+                type: 'POST',
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
                     return {
                         action: 'coderembassy_search_products',
-                        search: params.term,
+                        search: params.term || '',
                         page: params.page || 1,
                         nonce: coderembassyAdminData.nonce
                     };
@@ -147,8 +162,7 @@
                     params.page = params.page || 1;
                     
                     // Handle both success and error responses
-                    if (data.success && data.data) {
-                        console.log(data.success);
+                    if (data && data.success && data.data) {
                         return {
                             results: data.data.results || [],
                             pagination: {
@@ -156,6 +170,10 @@
                             }
                         };
                     } else {
+                        // Log error for debugging
+                        if (data && data.data && data.data.message) {
+                            console.error('Product search error:', data.data.message);
+                        }
                         return {
                             results: [],
                             pagination: {
@@ -166,6 +184,7 @@
                 },
                 cache: true,
                 error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error, xhr.responseText);
                     return {
                         results: [],
                         pagination: {

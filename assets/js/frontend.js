@@ -93,6 +93,12 @@
 
             // Initialize add to cart button
             initAddToCartButton($container, ajaxCart);
+            
+            // Initialize quantity +/- stepper buttons
+            initQtyButtons($container);
+
+            // Sync product card state (checked + qty) from WooCommerce cart on page load
+            syncCartStateOnLoad($container);
         });
     }
 
@@ -108,28 +114,73 @@
             var $productItem = $input.closest('.coderembassy-product-item');
             var productId = $input.data('product-id');
             var isRadio = $input.is('input[type="radio"]');
-            var hasVariations = $productItem.hasClass('has-variations');
 
             if ($input.is(':checked')) {
+
+                // For radio: check if another product is already selected/in-cart
+                if (isRadio && (ajaxCart || quickCart)) {
+                    var $prevSelected = $container.find('.coderembassy-product-item.selected').not($productItem);
+                    if ($prevSelected.length > 0) {
+                        var prevName = $prevSelected.find('.coderembassy-product-title, .coderembassy-product-name, h3, h4').first().text().trim() || 'the selected product';
+                        var newName  = $productItem.find('.coderembassy-product-title, .coderembassy-product-name, h3, h4').first().text().trim() || 'this product';
+                        
+                        showCustomConfirm(
+                            '"' + prevName + '" is already in your cart.\n\nSelecting "' + newName + '" will remove it from the cart.\n\nDo you want to continue?',
+                            function() { // onConfirm
+                                // Remove old product from cart first, then add new
+                                var prevProductId = $prevSelected.find('input[data-product-id]').data('product-id');
+                                $prevSelected.removeClass('selected');
+                                $prevSelected.find('.coderembassy-product-quantity').removeClass('active');
+                                $prevSelected.find('.coderembassy-product-radio-input').prop('checked', false);
+                                
+                                // Apply new selection visually immediately
+                                $productItem.addClass('selected');
+                                $productItem.find('.coderembassy-product-quantity').addClass('active');
+                                $container.find('.coderembassy-product-item').not($productItem).removeClass('selected');
+                                $container.find('.coderembassy-product-item').not($productItem).find('.coderembassy-product-quantity').removeClass('active');
+                                $container.find('.coderembassy-product-radio-input').not($input).prop('checked', false);
+                                updateAddToCartButton($container);
+
+                                removeFromCartAjax($container, prevProductId, function() {
+                                    if (quickCart && $input.is(':checked')) {
+                                        var productData = getProductData($productItem, productId);
+                                        addToCartQuick($container, [productData], $productItem);
+                                    }
+                                });
+                            },
+                            function() { // onCancel
+                                // User cancelled: restore previous radio
+                                $input.prop('checked', false);
+                                updateAddToCartButton($container);
+                            }
+                        );
+                        return; // Stop here, wait for callback
+                    }
+                }
+
                 $productItem.addClass('selected');
+                $productItem.find('.coderembassy-product-quantity').addClass('active');
                 
-                // For radio buttons, unselect all other products
+                // For radio buttons, unselect all other products (visual only — cart already handled above)
                 if (isRadio) {
                     $container.find('.coderembassy-product-item').not($productItem).removeClass('selected');
+                    $container.find('.coderembassy-product-item').not($productItem).find('.coderembassy-product-quantity').removeClass('active');
                     $container.find('.coderembassy-product-radio-input').not($input).prop('checked', false);
                 }
                 
                 // Add to cart based on mode
                 if (quickCart) {
-                    // Quick cart functionality - add to cart immediately when checked
                     var productData = getProductData($productItem, productId);
                     addToCartQuick($container, [productData], $productItem);
                 }
-                // For regular AJAX add to cart, products are only added when "Add Selected to Cart" button is clicked
-                // For variable products with AJAX cart, they'll be added when variations are selected
                 
             } else {
                 $productItem.removeClass('selected');
+                $productItem.find('.coderembassy-product-quantity').removeClass('active');
+                
+                if (ajaxCart || quickCart) {
+                    removeFromCartAjax($container, productId);
+                }
             }
 
             updateAddToCartButton($container);
@@ -155,11 +206,15 @@
                 return;
             }
             
+            // Don't trigger if clicking inside the quantity stepper area
+            if ($(e.target).closest('.coderembassy-product-quantity, .coderembassy-qty-controls').length > 0) {
+                return;
+            }
+            
             var $productItem = $(this);
             var $input = $productItem.find('input[type="checkbox"], input[type="radio"]');
             var productId = $input.data('product-id');
             var isRadio = $input.is('input[type="radio"]');
-            var hasVariations = $productItem.hasClass('has-variations');
             
             // Don't allow clicking if input is disabled (variations not selected)
             if ($input.prop('disabled')) {
@@ -168,37 +223,82 @@
             
             if (productId) {
                 
-                // Toggle the input state
                 if ($input.is(':checked')) {
-                    // If already checked, uncheck it
-                    $input.prop('checked', false);
-                    $productItem.removeClass('selected');
+                    // Already checked — uncheck (radios shouldn't toggle off on re-click, checkboxes can)
+                    if (!isRadio) {
+                        $input.prop('checked', false);
+                        $productItem.removeClass('selected');
+                        $productItem.find('.coderembassy-product-quantity').removeClass('active');
+                        if (ajaxCart || quickCart) {
+                            removeFromCartAjax($container, productId);
+                        }
+                        updateAddToCartButton($container);
+                    }
+                    // Radio: clicking the already-selected item does nothing
                 } else {
-                    // If not checked, check it
+                    // Not yet checked — for radio with existing cart item, confirm swap
+                    if (isRadio && (ajaxCart || quickCart)) {
+                        var $prevSelected = $container.find('.coderembassy-product-item.selected').not($productItem);
+                        if ($prevSelected.length > 0) {
+                            var prevName = $prevSelected.find('.coderembassy-product-title, .coderembassy-product-name, h3, h4').first().text().trim() || 'the selected product';
+                            var newName  = $productItem.find('.coderembassy-product-title, .coderembassy-product-name, h3, h4').first().text().trim() || 'this product';
+                            
+                            showCustomConfirm(
+                                '"' + prevName + '" is already in your cart.\n\nSelecting "' + newName + '" will remove it from the cart.\n\nDo you want to continue?',
+                                function() { // onConfirm
+                                    var prevProductId = $prevSelected.find('input[data-product-id]').data('product-id');
+                                    $prevSelected.removeClass('selected');
+                                    $prevSelected.find('.coderembassy-product-quantity').removeClass('active');
+                                    $prevSelected.find('.coderembassy-product-radio-input').prop('checked', false);
+                                    
+                                    // Select the new product visually
+                                    $input.prop('checked', true);
+                                    $productItem.addClass('selected');
+                                    $productItem.find('.coderembassy-product-quantity').addClass('active');
+                                    $container.find('.coderembassy-product-item').not($productItem).removeClass('selected');
+                                    $container.find('.coderembassy-product-item').not($productItem).find('.coderembassy-product-quantity').removeClass('active');
+                                    $container.find('.coderembassy-product-radio-input').not($input).prop('checked', false);
+                                    updateAddToCartButton($container);
+
+                                    removeFromCartAjax($container, prevProductId, function() {
+                                        if (quickCart && $input.is(':checked')) {
+                                            var productData = getProductData($productItem, productId);
+                                            addToCartQuick($container, [productData], $productItem);
+                                        }
+                                    });
+                                },
+                                function() { // onCancel
+                                    // do nothing
+                                }
+                            );
+                            return; // Stop here, wait for callback
+                        }
+                    }
+
+                    // Select the new product
                     $input.prop('checked', true);
                     $productItem.addClass('selected');
+                    $productItem.find('.coderembassy-product-quantity').addClass('active');
                     
-                    // For radio buttons, unselect all other products
+                    // For radio buttons, unselect all other products visually
                     if (isRadio) {
                         $container.find('.coderembassy-product-item').not($productItem).removeClass('selected');
+                        $container.find('.coderembassy-product-item').not($productItem).find('.coderembassy-product-quantity').removeClass('active');
                         $container.find('.coderembassy-product-radio-input').not($input).prop('checked', false);
                     }
                     
                     // Add to cart based on mode
                     if (quickCart) {
-                        // Quick Cart: Add to cart immediately
                         var productData = getProductData($productItem, productId);
                         addToCartQuick($container, [productData], $productItem);
                     }
-                    // For regular AJAX add to cart, products are only added when "Add Selected to Cart" button is clicked
-                    // For variable products with AJAX cart, they'll be added when variations are selected
+                    
+                    updateAddToCartButton($container);
                 }
-                
-                // Update add to cart button state
-                updateAddToCartButton($container);
             }
         });
     }
+
     
     function initVariationHandlers($container) {
         // Initialize variation state for products with variations
@@ -358,12 +458,178 @@
         });
     }
 
+    function initQtyButtons($container) {
+        // Use event delegation so it works even if product cards are re-rendered
+        $container.off('click.coderembassy-qty');
+
+        $container.on('click.coderembassy-qty', '.coderembassy-qty-plus, .coderembassy-qty-minus', function(e) {
+            e.preventDefault();
+            e.stopPropagation(); // Don't bubble up to product item click handler
+
+            var $btn = $(this);
+            var $qtyInput = $btn.closest('.coderembassy-qty-controls').find('.coderembassy-qty-input');
+            var currentVal = parseInt($qtyInput.val(), 10) || 1;
+            var max = parseInt($qtyInput.attr('max'), 10) || 99;
+            var min = parseInt($qtyInput.attr('min'), 10) || 1;
+
+            if ($btn.hasClass('coderembassy-qty-plus')) {
+                if (currentVal < max) {
+                    $qtyInput.val(currentVal + 1);
+                }
+            } else {
+                if (currentVal > min) {
+                    $qtyInput.val(currentVal - 1);
+                }
+            }
+
+            // If the product is already selected (in cart), update the cart quantity
+            var $productItem = $btn.closest('.coderembassy-product-item');
+            var isSelected = $productItem.hasClass('selected');
+            var ajaxCart = $container.data('ajax-cart') == '1' || $container.data('ajax-cart') === 1;
+            var quickCart = $container.data('quick-cart') == '1' || $container.data('quick-cart') === 1;
+
+            if (isSelected && (ajaxCart || quickCart)) {
+                var productId = $productItem.find('input[data-product-id]').data('product-id');
+                var newQty = parseInt($qtyInput.val(), 10) || 1;
+                // Debounce so rapid clicks only fire one request
+                clearTimeout($qtyInput.data('coderembassy-qty-timer'));
+                $qtyInput.data('coderembassy-qty-timer', setTimeout(function() {
+                    updateCartQuantityAjax($container, productId, newQty);
+                }, 350));
+            }
+        });
+
+        // Prevent typing in quantity field from bubbling to product item click handler
+        $container.on('click.coderembassy-qty', '.coderembassy-qty-input', function(e) {
+            e.stopPropagation();
+        });
+
+        // Sanitize typed quantity values on change; also update cart if selected
+        $container.on('change.coderembassy-qty', '.coderembassy-qty-input', function() {
+            var $input = $(this);
+            var val = parseInt($input.val(), 10);
+            var max = parseInt($input.attr('max'), 10) || 99;
+            var min = parseInt($input.attr('min'), 10) || 1;
+            if (isNaN(val) || val < min) {
+                $input.val(min);
+                val = min;
+            } else if (val > max) {
+                $input.val(max);
+                val = max;
+            }
+
+            var $productItem = $input.closest('.coderembassy-product-item');
+            var isSelected = $productItem.hasClass('selected');
+            var ajaxCart = $container.data('ajax-cart') == '1' || $container.data('ajax-cart') === 1;
+            var quickCart = $container.data('quick-cart') == '1' || $container.data('quick-cart') === 1;
+
+            if (isSelected && (ajaxCart || quickCart)) {
+                var productId = $productItem.find('input[data-product-id]').data('product-id');
+                updateCartQuantityAjax($container, productId, val);
+            }
+        });
+    }
+
+    /**
+     * Update the quantity of a product already in the cart.
+     */
+    function updateCartQuantityAjax($container, productId, quantity) {
+        $.ajax({
+            url: coderembassyData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'coderembassy_update_cart_quantity',
+                product_id: productId,
+                quantity: quantity,
+                nonce: coderembassyData.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Refresh mini-cart count
+                    if (response.data.cart_count !== undefined) {
+                        $('.cart-contents-count, .cart-count, .woocommerce-cart-count').text(response.data.cart_count);
+                    }
+                    // Reload checkout section to reflect updated totals
+                    showCheckoutSection($container);
+                    // Trigger WooCommerce fragment refresh
+                    $(document.body).trigger('wc_fragment_refresh');
+                    $(document.body).trigger('updated_wc_div');
+                }
+            }
+        });
+    }
+
+    /**
+     * On page load: fetch current cart contents and sync product card state.
+     * - Marks matching product cards as selected (checked).
+     * - Sets their qty input to the cart quantity.
+     * - Shows the checkout section if any in-cart products are found.
+     */
+    function syncCartStateOnLoad($container) {
+        var ajaxCart = $container.data('ajax-cart') == '1' || $container.data('ajax-cart') === 1;
+        var quickCart = $container.data('quick-cart') == '1' || $container.data('quick-cart') === 1;
+
+        // Only sync in AJAX or Quick Cart mode
+        if (!ajaxCart && !quickCart) {
+            return;
+        }
+
+        $.ajax({
+            url: coderembassyData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'coderembassy_get_cart_contents',
+                nonce: coderembassyData.nonce
+            },
+            success: function(response) {
+                if (!response.success || !response.data.items) {
+                    return;
+                }
+
+                var cartItems = response.data.items; // { "product_id": quantity, ... }
+                var hasCartItems = Object.keys(cartItems).length > 0;
+
+                if (!hasCartItems) {
+                    return;
+                }
+
+                // Walk each product card and sync state
+                $container.find('.coderembassy-product-item').each(function() {
+                    var $item = $(this);
+                    var $input = $item.find('input[data-product-id]');
+                    var productId = String($input.data('product-id'));
+
+                    if (cartItems.hasOwnProperty(productId)) {
+                        var qty = cartItems[productId];
+
+                        // Mark as selected
+                        $input.prop('checked', true);
+                        $item.addClass('selected');
+                        $item.find('.coderembassy-product-quantity').addClass('active');
+
+                        // Set qty input to match cart
+                        $item.find('.coderembassy-qty-input').val(qty);
+                    }
+                });
+
+                // Update the add-to-cart button state
+                updateAddToCartButton($container);
+
+                // Show checkout section if cart has items
+                showCheckoutSection($container);
+            }
+        });
+    }
+
+
     function getProductData($productItem, productId) {
         var $input = $productItem.find('input[type="checkbox"], input[type="radio"]');
         var variationAttributes = $input.data('variation-attributes');
+        var quantity = parseInt($productItem.find('.coderembassy-qty-input').val(), 10) || 1;
         
         var productData = {
-            product_id: productId
+            product_id: productId,
+            quantity: quantity
         };
         
         // Add variation data if available
@@ -419,9 +685,8 @@
             wc_add_to_cart_params.wc_ajax_url = 'disabled';
         }
         
-        // Temporarily disable WooCommerce add to cart events
-        $(document.body).off('added_to_cart');
-        $(document.body).off('wc_fragment_refresh');
+        // Removed: $(document.body).off('added_to_cart');
+        // Removed: $(document.body).off('wc_fragment_refresh');
         
         // Set a flag to prevent WooCommerce from processing our AJAX response
         window.coderembassy_processing = true;
@@ -499,8 +764,34 @@
                         
                         // Trigger WooCommerce's own cart update mechanism with a delay
                         setTimeout(function() {
+                            if (response.success && response.data.checkout_form) {
+                                var $checkoutContent = $container.find('.coderembassy-checkout-content');
+                                var formHtml = '';
+                                
+                                if (coderembassyData.checkoutLayoutStyle === 'custom') {
+                                    // Custom 2-column layout requested
+                                    formHtml = '<div class="coderembassy-checkout-form coderembassy-custom-layout">' + response.data.checkout_form + '</div>';
+                                } else {
+                                    // Default Theme layout: strictly raw output for native theme compatibility
+                                    formHtml = '<div class="coderembassy-checkout-form">' + response.data.checkout_form + '</div>';
+                                }
+                                    
+                                $checkoutContent.html(formHtml);
+                                
+                                // Re-initialize WooCommerce's shipping toggle so it works inside our container.
+                                $(document.body).trigger('update_checkout');
+                            }
                             if (typeof wc_cart_fragments_params !== 'undefined') {
-                                $(document.body).trigger('wc_fragment_refresh');
+                                // Important: trigger added_to_cart with fragments so side carts open
+                                if (response.data.cart_fragments && response.data.cart_hash) {
+                                    $(document.body).trigger('added_to_cart', [
+                                        response.data.cart_fragments, 
+                                        response.data.cart_hash, 
+                                        $button
+                                    ]);
+                                } else {
+                                    $(document.body).trigger('wc_fragment_refresh');
+                                }
                                 $(document.body).trigger('update_checkout');
                             }
                         }, 100);
@@ -730,8 +1021,12 @@
         // Add selected product IDs
         $.each(productIds, function(index, productData) {
             if (typeof productData === 'object' && productData.product_id) {
-                // New format: {product_id: 49, variation: {...}}
+                // New format: {product_id: 49, quantity: 2, variation: {...}}
                 $form.append('<input type="hidden" name="product_ids[]" value="' + productData.product_id + '">');
+                
+                // Add quantity
+                var qty = productData.quantity || 1;
+                $form.append('<input type="hidden" name="quantities[' + productData.product_id + ']" value="' + qty + '">');
                 
                 // Add variation data if present
                 if (productData.variation && Object.keys(productData.variation).length > 0) {
@@ -763,8 +1058,102 @@
         // Remove selected class from product items
         $container.find('.coderembassy-product-item.selected').removeClass('selected');
         
+        // Hide quantity inputs and reset to 1
+        $container.find('.coderembassy-product-quantity').removeClass('active');
+        $container.find('.coderembassy-qty-input').val(1);
+        
         // Update add to cart button
         updateAddToCartButton($container);
+    }
+
+    /**
+     * Remove a specific product from the WooCommerce cart via AJAX.
+     * Called whenever a product is unchecked in AJAX or Quick Cart mode.
+     */
+    function removeFromCartAjax($container, productId, callback) {
+        $.ajax({
+            url: coderembassyData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'coderembassy_remove_from_cart',
+                nonce:  coderembassyData.nonce,
+                product_id: productId
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Trigger WooCommerce specific events for side carts
+                    if (response.data.cart_fragments && response.data.cart_hash) {
+                        $(document.body).trigger('removed_from_cart', [
+                            response.data.cart_fragments, 
+                            response.data.cart_hash, 
+                            null
+                        ]);
+                    } else {
+                        $(document.body).trigger('wc_fragment_refresh');
+                    }
+                    $(document.body).trigger('updated_wc_div');
+                    
+                    // Refresh the checkout section to reflect updated cart
+                    var $checkoutSection = getCheckoutSection($container);
+                    if ($checkoutSection.length && $checkoutSection.is(':visible')) {
+                        var $checkoutContent = $checkoutSection.find('.coderembassy-checkout-content');
+                        if (response.data.cart_count === 0) {
+                            // Cart is now empty — show empty state
+                            $checkoutContent.html('<div class="coderembassy-empty-cart">' + 
+                                (coderembassyData.i18n.emptyCart || 'Your cart is empty.') + 
+                            '</div>');
+                        } else {
+                            // Still items in cart — reload checkout form
+                            loadCheckoutForm($checkoutContent);
+                        }
+                    }
+                }
+                if (typeof callback === 'function') {
+                    callback(response);
+                }
+            },
+            error: function(xhr, status, error) {
+                if (typeof callback === 'function') {
+                    callback({ success: false, error: error });
+                }
+            }
+        });
+    }
+
+    /**
+     * Show custom confirmation modal string styling
+     */
+    function showCustomConfirm(message, onConfirm, onCancel) {
+        var modalHtml = 
+            '<div class="coderembassy-confirm-modal-backdrop">' +
+                '<div class="coderembassy-confirm-modal">' +
+                    '<div class="coderembassy-confirm-message">' + message.replace(/\n/g, '<br>') + '</div>' +
+                    '<div class="coderembassy-confirm-actions">' +
+                        '<button class="coderembassy-btn coderembassy-btn-secondary coderembassy-cancel-btn">' + (coderembassyData.i18n.cancelText || 'Cancel') + '</button>' +
+                        '<button class="coderembassy-btn coderembassy-btn-primary coderembassy-confirm-btn">' + (coderembassyData.i18n.confirmText || 'Yes, continue') + '</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+            
+        var $modal = $(modalHtml).appendTo('body');
+        
+        $modal.hide().fadeIn(150);
+        
+        $modal.find('.coderembassy-cancel-btn').on('click', function(e) {
+            e.preventDefault();
+            $modal.fadeOut(150, function() {
+                $(this).remove();
+            });
+            if (typeof onCancel === 'function') onCancel();
+        });
+        
+        $modal.find('.coderembassy-confirm-btn').on('click', function(e) {
+            e.preventDefault();
+            $modal.fadeOut(150, function() {
+                $(this).remove();
+            });
+            if (typeof onConfirm === 'function') onConfirm();
+        });
     }
 
     function showMessage($container, type, message) {
@@ -854,31 +1243,35 @@
     }
     
     function showCheckoutSection($container) {
-        var $checkoutSection = $container.find('.coderembassy-checkout-section');
+        var $checkoutSection = getCheckoutSection($container);
         
         if ($checkoutSection.length > 0) {
             // Show the checkout section
             $checkoutSection.show();
             
-            // Update the checkout content to show the form instead of empty cart message
             var $checkoutContent = $checkoutSection.find('.coderembassy-checkout-content');
-            var $emptyCartMessage = $checkoutContent.find('.coderembassy-empty-cart');
-            var $checkoutForm = $checkoutContent.find('.coderembassy-checkout-form');
-            
-            if ($emptyCartMessage.length > 0) {
-                // Hide empty cart message
-                $emptyCartMessage.hide();
-                
-                // Always load checkout form via AJAX since the server-side condition was for empty cart
-                loadCheckoutForm($checkoutContent);
-            } else if ($checkoutForm.length === 0) {
-                // If no empty cart message and no checkout form, load it
-                loadCheckoutForm($checkoutContent);
-            } else {
-                // Show existing checkout form
-                $checkoutForm.show();
-            }
+
+            // Always reload the checkout form so it reflects the latest cart contents
+            // (covers first load, subsequent adds, and quantity changes)
+            loadCheckoutForm($checkoutContent);
         }
+    }
+    
+    /**
+     * Find the checkout section — it is rendered as a SIBLING of the
+     * .coderembassy-express-checkout container, not a child of it.
+     */
+    function getCheckoutSection($container) {
+        // 1. Try immediate next sibling
+        var $section = $container.nextAll('.coderembassy-checkout-section').first();
+        if ($section.length) return $section;
+        
+        // 2. Try within the same parent (covers wrappers like <div class="entry-content">)
+        $section = $container.parent().find('.coderembassy-checkout-section').first();
+        if ($section.length) return $section;
+        
+        // 3. Global fallback
+        return $('.coderembassy-checkout-section').first();
     }
     
     function loadCheckoutForm($checkoutContent) {
@@ -892,9 +1285,11 @@
         $.ajax({
             url: coderembassyData.ajaxUrl,
             type: 'POST',
+            cache: false,
             data: {
                 action: 'coderembassy_get_checkout_form',
-                nonce: coderembassyData.nonce
+                nonce: coderembassyData.nonce,
+                _t: Date.now() // cache-buster
             },
             success: function(response) {
 
@@ -903,10 +1298,32 @@
                 if (response.success && response.data.checkout_form) {
                     $checkoutContent.html('<div class="coderembassy-checkout-form">' + response.data.checkout_form + '</div>');
                     
+                    // Re-initialize WooCommerce's shipping toggle so it works inside our container.
+                    // WC normally handles this in checkout.js which runs on the native checkout page;
+                    // because we inject the form via AJAX we must replicate it here.
+                    var $shippingCheckbox = $checkoutContent.find('#ship-to-different-address-checkbox');
+                    var $shippingAddress  = $checkoutContent.find('.shipping_address');
+
+                    // Apply correct initial visibility
+                    if ($shippingCheckbox.length && $shippingAddress.length) {
+                        if ($shippingCheckbox.is(':checked')) {
+                            $shippingAddress.show();
+                        } else {
+                            $shippingAddress.hide();
+                        }
+                        // Toggle on change
+                        $shippingCheckbox.off('change.wc_shipping').on('change.wc_shipping', function() {
+                            if ($(this).is(':checked')) {
+                                $shippingAddress.slideDown();
+                            } else {
+                                $shippingAddress.slideUp();
+                            }
+                        });
+                    }
+
                 } else {
-                    $checkoutContent.html('<div class="coderembassy-checkout-form"><p class="coderembassy-checkout-error">' + 
-                        'Unable to load checkout form. Please refresh the page.' + 
-                        '</p></div>');
+                    var errMsg = (response.data && response.data.message) ? response.data.message : 'Unable to load checkout form. Please refresh the page.';
+                    $checkoutContent.html('<div class="coderembassy-checkout-form"><p class="coderembassy-checkout-error">' + errMsg + '</p></div>');
                 }
             },
             error: function(xhr, status, error) {

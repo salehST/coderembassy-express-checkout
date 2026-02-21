@@ -20,12 +20,14 @@
 .coderembassy-product-item {
     position: relative;
     border: 2px solid #e1e5e9;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 15px;
     background: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
     overflow: visible;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Quick cart enabled - make product items clickable */
@@ -206,7 +208,8 @@
 
 .coderembassy-product-item.selected {
     border-color: #007cba;
-    background-color: #f0f8ff;
+    background: linear-gradient(135deg, #f0f8ff 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(0, 124, 186, 0.18);
 }
 
 /* Auto-selected state for products with complete variations */
@@ -316,29 +319,45 @@
 
 .coderembassy-product-image {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
 }
 
 .coderembassy-product-image img {
     max-width: 100%;
     height: auto;
-    border-radius: 4px;
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Body: fills available vertical space so footer pins to bottom */
+.coderembassy-product-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .coderembassy-product-title {
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     line-height: 1.4;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    flex: 1 1 auto;   /* grows inside body, pushing footer down */
+}
+
+/* Footer: price + qty, always at the bottom of the card */
+.coderembassy-product-footer {
+    flex-shrink: 0;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .coderembassy-product-price {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #007cba;
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .coderembassy-product-sale-badge {
@@ -722,12 +741,77 @@
 .coderembassy-checkout-form .form-row input:focus,
 .coderembassy-checkout-form .form-row select:focus,
 .coderembassy-checkout-form .form-row textarea:focus {
+
     outline: none;
     border-color: #007cba;
     box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
 }
 
+
+/* Fix Checkout Customer Details Column Layout (Billing left, Additional/Shipping right) */
+@media (min-width: 768px) {
+    .coderembassy-checkout-form .col2-set {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        margin: 0 -15px;
+    }
+    /* col-1 always shows: billing details */
+    .coderembassy-checkout-form .col2-set .col-1 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+    /* col-2 (shipping) only takes 50% width when the shipping address section is visible */
+    .coderembassy-checkout-form .col2-set .col-2 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+    /* When shipping is hidden, col-1 expands to full width */
+    .coderembassy-checkout-form .col2-set .col-2:not(:has(.shipping_address:visible)) {
+        display: none;
+    }
+}
+
+/* Ensure WooCommerce's hidden shipping address section stays hidden until checked */
+.coderembassy-checkout-form .shipping_address {
+    display: none;
+}
+/* WooCommerce JS adds this class when the checkbox is checked */
+.coderembassy-checkout-form .shipping-address-active .shipping_address,
+.coderembassy-checkout-form #ship-to-different-address-checkbox:checked ~ * .shipping_address {
+    display: block;
+}
+
+/* Fix Form Row Layouts (First/Last fields side-by-side) */
+.coderembassy-checkout-form .form-row {
+    float: left;
+    width: 100%;
+}
+.coderembassy-checkout-form .form-row-first {
+    width: 48%;
+    clear: left;
+}
+.coderembassy-checkout-form .form-row-last {
+    width: 48%;
+    float: right;
+}
+.coderembassy-checkout-form .form-row-wide {
+    clear: both;
+}
+.coderembassy-checkout-form::after,
+.coderembassy-checkout-form .woocommerce-billing-fields::after,
+.coderembassy-checkout-form .woocommerce-shipping-fields::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 .coderembassy-checkout-form .woocommerce-checkout-payment {
+
     background: #f8f9fa;
     padding: 20px;
     border-radius: 6px;
@@ -756,3 +840,238 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
 }
+
+/* ============================================================
+   Quantity Stepper Styles
+   ============================================================ */
+
+.coderembassy-product-quantity {
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    transition: max-height 0.28s ease, opacity 0.18s ease, padding-top 0.28s ease !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    border-top: 1px solid transparent !important;
+}
+
+.coderembassy-product-item.selected .coderembassy-product-quantity,
+.coderembassy-product-quantity.active {
+    max-height: 80px !important;
+    opacity: 1 !important;
+    padding-top: 8px !important;
+    margin-top: 8px !important;
+    border-top-color: #e9ecef !important;
+}
+
+.coderembassy-qty-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #555 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+    float: none !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.coderembassy-qty-controls {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    flex-wrap: nowrap !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.coderembassy-qty-btn {
+    background: #f8f9fa !important;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    font-size: 15px !important;
+    line-height: 28px !important;
+    cursor: pointer !important;
+    color: #007cba !important;
+    font-weight: 700 !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    float: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.coderembassy-qty-btn:hover {
+    background: #007cba !important;
+    color: #fff !important;
+}
+
+.coderembassy-qty-btn:active {
+    background: #005a87 !important;
+    color: #fff !important;
+}
+
+.coderembassy-qty-input {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    border: none !important;
+    border-left: 1px solid #dee2e6 !important;
+    border-right: 1px solid #dee2e6 !important;
+    border-radius: 0 !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    outline: none !important;
+    box-shadow: none !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+    float: none !important;
+}
+
+.coderembassy-qty-input::-webkit-outer-spin-button,
+.coderembassy-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+.coderembassy-qty-input:focus {
+    background: #f0f8ff !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .coderembassy-qty-btn {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        font-size: 13px !important;
+    }
+
+    .coderembassy-qty-input {
+        width: 34px !important;
+        min-width: 34px !important;
+        height: 26px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* ========================================================= */
+/* Custom Confirmation Modal
+/* ========================================================= */
+.coderembassy-confirm-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.coderembassy-confirm-modal {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 100%;
+    overflow: hidden;
+    animation: coderembassyModalFadeIn 0.2s ease-out;
+}
+
+@keyframes coderembassyModalFadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.coderembassy-confirm-message {
+    padding: 24px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.coderembassy-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    background: #fafafa;
+    gap: 12px;
+}
+
+.coderembassy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    line-height: 1.5;
+}
+
+.coderembassy-btn-secondary {
+    background: #fff;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.coderembassy-btn-secondary:hover {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #ccc;
+}
+
+.coderembassy-btn-primary {
+    background: #007cba;
+    color: #fff;
+    border: 1px solid #007cba;
+}
+
+.coderembassy-btn-primary:hover {
+    background: #006ba1;
+    border-color: #006ba1;
+}
+

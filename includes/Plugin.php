@@ -67,6 +67,9 @@ class Plugin {
         new Admin\Admin();
         new Frontend\Shortcode();
         new Ajax\AjaxHandler();
+        
+        // Allow pro version to hook into plugin initialization
+        do_action('coderembassy_express_checkout_init');
     }
     
     
@@ -87,8 +90,37 @@ class Plugin {
     public function enqueue_scripts() {
         // Only enqueue if we have shortcodes on the page
         global $post;
-        if (!$post || (!has_shortcode($post->post_content, 'ce_checkout') && !has_shortcode($post->post_content, 'coderembassy_express_checkout'))) {
+        if (!$post || (!has_shortcode($post->post_content, 'coderembassy_checkout') && !has_shortcode($post->post_content, 'ceec_checkout') && !has_shortcode($post->post_content, 'ce_checkout') && !has_shortcode($post->post_content, 'coderembassy_express_checkout'))) {
             return;
+        }
+        
+        // Ensure WooCommerce checkout scripts and styles are formally enqueued just in case we are on a custom page
+        if (function_exists('is_woocommerce') && function_exists('WC')) {
+            // Load core WC scripts if they haven't been already
+            if (class_exists('WC_Frontend_Scripts')) {
+                \WC_Frontend_Scripts::load_scripts();
+            }
+            
+            // Core WC styles
+            wp_enqueue_style('woocommerce-layout');
+            wp_enqueue_style('woocommerce-smallscreen');
+            wp_enqueue_style('woocommerce-general');
+            
+            // Core WC scripts needed for checkout
+            wp_enqueue_script('wc-add-to-cart');
+            wp_enqueue_script('woocommerce');
+            wp_enqueue_script('wc-cart-fragments');
+            
+            // Checkout specific scripts
+            wp_enqueue_script('selectWoo');
+            wp_enqueue_script('wc-country-select');
+            wp_enqueue_script('wc-address-i18n');
+            wp_enqueue_script('wc-checkout');
+            wp_enqueue_script('wc-password-strength-meter');
+            
+            // Trigger the woocommerce_frontend_scripts action to allow gateways to load their scripts
+            do_action('woocommerce_frontend_scripts');
+            do_action('woocommerce_enqueue_styles');
         }
         
         wp_enqueue_script(
@@ -106,10 +138,15 @@ class Plugin {
             $this->version
         );
         
+        // Get global options
+        $options = get_option('coderembassy_global_options', array());
+        $checkout_layout_style = isset($options['checkout_layout_style']) ? $options['checkout_layout_style'] : 'theme';
+
         // Localize script
         wp_localize_script('coderembassy-express-checkout-frontend', 'coderembassyData', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('coderembassy_express_checkout_nonce'),
+            'checkoutLayoutStyle' => $checkout_layout_style,
             'i18n' => array(
                 'addSelectedToCart' => esc_html__('Add Selected to Cart', 'coderembassy-express-checkout'),
                 'noProductsSelected' => esc_html__('Please select at least one product.', 'coderembassy-express-checkout'),
@@ -118,6 +155,20 @@ class Plugin {
                 'error' => esc_html__('An error occurred. Please try again.', 'coderembassy-express-checkout'),
             )
         ));
+        
+        // Add inline script to handle success messages from data attributes
+        $inline_script = "
+            jQuery(document).ready(function($) {
+                $('.coderembassy-express-checkout').each(function() {
+                    var \$container = $(this);
+                    var successMessage = \$container.data('success-message');
+                    if (successMessage && typeof showSuccessNotification === 'function') {
+                        showSuccessNotification(successMessage);
+                    }
+                });
+            });
+        ";
+        wp_add_inline_script('coderembassy-express-checkout-frontend', $inline_script);
     }
     
     /**
@@ -133,7 +184,7 @@ class Plugin {
         $should_load = false;
         
         // Check if we're on our post type pages
-        if ($post_type === 'ce_shortcode') {
+        if ($post_type === 'coderembassy_ec') {
             $should_load = true;
         }
         
@@ -195,6 +246,7 @@ class Plugin {
         // Localize admin script
         wp_localize_script('coderembassy-express-checkout-admin', 'coderembassyAdminData', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('coderembassy_admin_nonce'),
             'i18n' => array(
                 'searchProducts' => esc_html__('Type at least 3 characters to search products...', 'coderembassy-express-checkout'),
                 'noProductsFound' => esc_html__('No products found', 'coderembassy-express-checkout'),

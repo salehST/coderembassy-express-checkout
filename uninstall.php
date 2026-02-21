@@ -15,7 +15,7 @@ delete_option('coderembassy_express_checkout_version');
 
 // Clean up custom post type posts
 $posts = get_posts(array(
-    'post_type' => 'ce_shortcode',
+    'post_type' => 'coderembassy_ec',
     'numberposts' => -1,
     'post_status' => 'any'
 ));
