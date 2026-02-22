@@ -328,19 +328,21 @@ class Shortcode
                                     echo '<div class="coderembassy-checkout-form">';
                                 }
 
+                                // Trigger checkout initialization
+                                if (function_exists('WC') && WC()->checkout()) {
+                                    do_action('woocommerce_checkout_init', WC()->checkout());
+                                }
+
                                 // Ensure WooCommerce checkout scripts and gateway scripts are enqueued
                                 if (function_exists('wc_enqueue_js')) {
                                     do_action('woocommerce_enqueue_scripts');
+                                    do_action('woocommerce_frontend_scripts');
+                                    do_action('woocommerce_enqueue_styles');
                                 }
 
                                 // Render WooCommerce checkout form
-                                if (false && function_exists('woocommerce_checkout_form')) {
-                                    // @phpstan-ignore-next-line
-                                    woocommerce_checkout_form();
-                                } else {
-                                    // Use WooCommerce checkout shortcode
-                                    echo do_shortcode('[woocommerce_checkout]');
-                                }
+                                // Use WooCommerce checkout shortcode
+                                echo do_shortcode('[woocommerce_checkout]');
 
                                 echo '</div>';
                             }

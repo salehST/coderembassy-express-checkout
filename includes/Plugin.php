@@ -134,7 +134,7 @@ class Plugin
         wp_enqueue_script(
             'coderembassy-express-checkout-frontend',
             CODEREMBASSY_EXPRESS_CHECKOUT_PLUGIN_URL . 'assets/js/frontend.js',
-            array('jquery', 'wc-add-to-cart'),
+            array('jquery', 'wc-add-to-cart', 'wc-checkout'),
             $this->version,
             true
         );
