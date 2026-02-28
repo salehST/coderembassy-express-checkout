@@ -20,12 +20,14 @@
 .coderembassy-product-item {
     position: relative;
     border: 2px solid #e1e5e9;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 15px;
     background: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
     overflow: visible;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Quick cart enabled - make product items clickable */
@@ -190,23 +192,24 @@
 }
 
 @keyframes quickCartPulse {
-    0% { 
-        transform: scale(1); 
+    0% {
+        transform: scale(1);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    50% { 
-        transform: scale(1.05); 
+    50% {
+        transform: scale(1.05);
         box-shadow: 0 4px 20px rgba(46, 182, 80, 0.4);
     }
-    100% { 
-        transform: scale(1); 
+    100% {
+        transform: scale(1);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 }
 
 .coderembassy-product-item.selected {
     border-color: #007cba;
-    background-color: #f0f8ff;
+    background: linear-gradient(135deg, #f0f8ff 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(0, 124, 186, 0.18);
 }
 
 /* Auto-selected state for products with complete variations */
@@ -217,16 +220,16 @@
 }
 
 @keyframes autoSelectPulse {
-    0% { 
-        transform: scale(1); 
+    0% {
+        transform: scale(1);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    50% { 
-        transform: scale(1.02); 
+    50% {
+        transform: scale(1.02);
         box-shadow: 0 4px 16px rgba(40, 167, 69, 0.3);
     }
-    100% { 
-        transform: scale(1); 
+    100% {
+        transform: scale(1);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 }
@@ -316,29 +319,45 @@
 
 .coderembassy-product-image {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
 }
 
 .coderembassy-product-image img {
     max-width: 100%;
     height: auto;
-    border-radius: 4px;
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Body: fills available vertical space so footer pins to bottom */
+.coderembassy-product-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .coderembassy-product-title {
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     line-height: 1.4;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    flex: 1 1 auto; /* grows inside body, pushing footer down */
+}
+
+/* Footer: price + qty, always at the bottom of the card */
+.coderembassy-product-footer {
+    flex-shrink: 0;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .coderembassy-product-price {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #007cba;
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .coderembassy-product-sale-badge {
@@ -403,11 +422,9 @@
         /* Only override gap on mobile, let grid-template-columns be controlled by admin settings */
         gap: 15px !important;
     }
-    
     .coderembassy-product-item {
         padding: 12px;
     }
-    
     .coderembassy-add-to-cart-btn {
         padding: 10px 25px;
         font-size: 14px;
@@ -420,21 +437,205 @@
         grid-template-columns: 1fr !important;
         gap: 10px !important;
     }
-    
     .coderembassy-product-item {
         padding: 10px;
     }
 }
 
+/* ============================================================
+   Default card design – always apply inside shortcode
+   Ensures plugin design wins over theme CSS (free and pro themes).
+   ============================================================ */
+.coderembassy-express-checkout .coderembassy-products-grid {
+    display: grid !important;
+    flex-wrap: unset !important;
+    flex-direction: unset !important;
+    margin-bottom: 30px !important;
+}
+.coderembassy-express-checkout .coderembassy-product-item {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: none !important;
+    width: auto !important;
+    position: relative !important;
+    border: 2px solid #e1e5e9 !important;
+    border-radius: 12px !important;
+    padding: 15px !important;
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07) !important;
+    overflow: visible !important;
+}
+.coderembassy-express-checkout .coderembassy-product-item:hover {
+    border-color: #007cba !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+.coderembassy-express-checkout .coderembassy-product-sale-badge {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    background: #ff6b6b !important;
+    color: #fff !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    z-index: 5 !important;
+}
+.coderembassy-express-checkout .coderembassy-product-checkbox {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 10 !important;
+}
+.coderembassy-express-checkout .coderembassy-product-image {
+    text-align: center !important;
+    margin-bottom: 12px !important;
+    flex-shrink: 0 !important;
+}
+.coderembassy-express-checkout .coderembassy-product-image img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+.coderembassy-express-checkout .coderembassy-product-body {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+}
+.coderembassy-express-checkout .coderembassy-product-title {
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    line-height: 1.4 !important;
+}
+.coderembassy-express-checkout .coderembassy-product-footer {
+    flex-shrink: 0 !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid #f0f0f0 !important;
+}
+.coderembassy-express-checkout .coderembassy-product-price {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #007cba !important;
+    margin-bottom: 0 !important;
+}
+.coderembassy-express-checkout .coderembassy-actions {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    text-align: right !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.coderembassy-express-checkout .coderembassy-add-to-cart-btn {
+    background: #007cba !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 12px 30px !important;
+    border-radius: 6px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+.coderembassy-express-checkout .coderembassy-product-quantity,
+.coderembassy-express-checkout .coderembassy-qty-controls,
+.coderembassy-express-checkout .coderembassy-qty-btn,
+.coderembassy-express-checkout .coderembassy-qty-input {
+    box-sizing: border-box !important;
+}
+
+/* ---- Product Footer (Price + Qty) – override theme on checkout/shortcode page ---- */
+.woocommerce-checkout .coderembassy-product-footer,
+.woocommerce-page .coderembassy-product-footer {
+    flex-shrink: 0 !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid #f0f0f0 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-price,
+.woocommerce-page .coderembassy-product-price {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #007cba !important;
+}
+
+/* WooCommerce price markup: strikethrough original, highlight sale price */
+.woocommerce-checkout .coderembassy-product-price del,
+.woocommerce-page .coderembassy-product-price del {
+    color: #999 !important;
+    text-decoration: line-through !important;
+    font-weight: 400 !important;
+    margin-right: 6px !important;
+}
+.woocommerce-checkout .coderembassy-product-price ins,
+.woocommerce-page .coderembassy-product-price ins {
+    text-decoration: none !important;
+    color: #007cba !important;
+}
+.woocommerce-checkout .coderembassy-product-price .screen-reader-text,
+.woocommerce-page .coderembassy-product-price .screen-reader-text {
+    position: absolute !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    overflow: hidden !important;
+    height: 1px !important; width: 1px !important;
+    margin: -1px !important; padding: 0 !important;
+    border: 0 !important;
+}
+
+/* ---- Quantity label (Qty:) ---- */
+.woocommerce-checkout .coderembassy-qty-label,
+.woocommerce-page .coderembassy-qty-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #555 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    margin-right: 6px !important;
+}
+
+/* ---- Quantity Controls ---- */
+.woocommerce-checkout .coderembassy-qty-controls,
+.woocommerce-page .coderembassy-qty-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-input,
+.woocommerce-page .coderembassy-qty-input {
+    width: 60px !important;
+    text-align: center !important;
+    padding: 4px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-btn,
+.woocommerce-page .coderembassy-qty-btn {
+    width: 28px !important;
+    height: 28px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    background: #f8f9fa !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    color: #333 !important;
+}
+
 /* Animation for quick cart */
 .coderembassy-product-item.quick-cart-added {
     animation: quickCartPulse 0.6s ease-in-out;
-}
-
-@keyframes quickCartPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); background-color: #e8f5e8; }
-    100% { transform: scale(1); }
 }
 
 /* Success and Error Messages - Now handled by popup notification system */
@@ -478,8 +679,7 @@
     border: 1px dashed #dee2e6;
 }
 
-
-.coderembassy-checkout-form {
+.coderembassy-checkout-form.coderembassy-custom-layout {
     margin-top: 20px;
     padding: 20px;
     background: #fff;
@@ -579,22 +779,22 @@
     flex-shrink: 0;
 }
 
-.coderembassy-notification-icon .dashicons {
+.coderembassy-notification-icon.dashicons {
     font-size: 20px;
     width: 20px;
     height: 20px;
     line-height: 1;
 }
 
-.coderembassy-notification-success .coderembassy-notification-icon .dashicons {
+.coderembassy-notification-success .coderembassy-notification-icon.dashicons {
     color: #46b450;
 }
 
-.coderembassy-notification-error .coderembassy-notification-icon .dashicons {
+.coderembassy-notification-error .coderembassy-notification-icon.dashicons {
     color: #dc3232;
 }
 
-.coderembassy-notification-info .coderembassy-notification-icon .dashicons {
+.coderembassy-notification-info .coderembassy-notification-icon.dashicons {
     color: #00a0d2;
 }
 
@@ -619,7 +819,7 @@
     background-color: #f0f0f1;
 }
 
-.coderembassy-notification-close .dashicons {
+.coderembassy-notification-close.dashicons {
     font-size: 16px;
     width: 16px;
     height: 16px;
@@ -640,14 +840,54 @@
         right: 10px;
         left: 10px;
     }
-    
     .coderembassy-notification {
         max-width: none;
         min-width: auto;
     }
 }
 
-/* WooCommerce Checkout Form Styling */
+/* ============================================================
+   WooCommerce Checkout Form Styling
+   ============================================================ */
+
+/* Base checkout section layout (always applied; light so themes can override) */
+.coderembassy-checkout-section {
+    margin: 30px 0;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.coderembassy-checkout-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e5e9;
+}
+.coderembassy-checkout-header h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 22px;
+    font-weight: 600;
+}
+.coderembassy-checkout-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+.coderembassy-checkout-content {
+    width: 100%;
+}
+.coderembassy-empty-cart {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px dashed #dee2e6;
+}
+
 .coderembassy-checkout-form .woocommerce-checkout {
     margin: 0;
 }
@@ -678,81 +918,1035 @@
     margin: 10px 0;
 }
 
-.coderembassy-checkout-form .woocommerce-billing-fields,
-.coderembassy-checkout-form .woocommerce-shipping-fields,
-.coderembassy-checkout-form .woocommerce-additional-fields,
-.coderembassy-checkout-form .woocommerce-checkout-review-order {
-    margin-bottom: 30px;
+/* ============================================================
+   Normal themes only: notice/coupon styles in custom layout.
+   Not applied when "Pro theme compatibility CSS" is enabled.
+   ============================================================ */
+body:not(.ceec-compat-css) #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-info,
+body:not(.ceec-compat-css) #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-message,
+body:not(.ceec-compat-css) #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-error,
+body:not(.ceec-compat-css) #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-form-coupon-toggle {
+    background: #f0f0f0 !important;
+    border: 1px solid #e5e5e5 !important;
+    color: #2c2d33 !important;
+    border-left: 4px solid #a46497 !important;
+    box-shadow: none !important;
+    margin: 0 0 16px 0 !important;
+    padding: 12px 16px !important;
 }
 
-.coderembassy-checkout-form .woocommerce-billing-fields h3,
-.coderembassy-checkout-form .woocommerce-shipping-fields h3,
-.coderembassy-checkout-form .woocommerce-additional-fields h3,
-.coderembassy-checkout-form .woocommerce-checkout-review-order h3 {
-    margin: 0 0 15px 0;
-    color: #333;
-    font-size: 16px;
-    font-weight: 600;
-    border-bottom: 2px solid #e1e5e9;
-    padding-bottom: 8px;
+/* ============================================================
+   Plugin Custom Layout styles (.coderembassy-custom-layout)
+   Only applied when "Pro theme compatibility CSS" is enabled in settings.
+   ============================================================ */
+
+/* Wrapper: use full width when Pro theme compatibility is on (e.g. with wrapper-full-width body) */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    color: inherit !important;
+    box-sizing: border-box !important;
 }
 
-.coderembassy-checkout-form .form-row {
-    margin-bottom: 15px;
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout h1,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout h2,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout h3,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout h4,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout h5,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout h6 {
+    color: #111 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
 }
 
-.coderembassy-checkout-form .form-row label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #555;
+/* Order review table cleanup */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .shop_table,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .shop_table th,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .shop_table td {
+    border-color: #e1e5e9 !important;
+    color: #333 !important;
 }
 
-.coderembassy-checkout-form .form-row input,
-.coderembassy-checkout-form .form-row select,
-.coderembassy-checkout-form .form-row textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
+/* Shipping methods list inside order review (themes like Astra/WoodMart normally do this) */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul#shipping_method,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.woocommerce-shipping-methods {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul#shipping_method li,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.woocommerce-shipping-methods li {
+    margin: 0 0 4px 0 !important;
 }
 
-.coderembassy-checkout-form .form-row input:focus,
-.coderembassy-checkout-form .form-row select:focus,
-.coderembassy-checkout-form .form-row textarea:focus {
-    outline: none;
-    border-color: #007cba;
-    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+/* Prevent theme link colors from leaking in */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout a {
+    color: #2ea2cc !important; /* Woo primary */
+    text-decoration: none !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout a:hover {
+    color: #1e8cbe !important;
+    text-decoration: underline !important;
 }
 
-.coderembassy-checkout-form .woocommerce-checkout-payment {
-    background: #f8f9fa;
+/* Two-column checkout layout: form fields left, order review right (tablet and up) */
+@media (min-width: 768px) {
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout form.checkout {
+        display: grid !important;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+        grid-column-gap: 24px !important;
+        align-items: start !important;
+    }
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-NoticeGroup-checkout,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-NoticeGroup {
+        grid-column: 1 / -1 !important;
+    }
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #customer_details,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #customer_details.customer-details {
+        grid-column: 1 / span 1 !important;
+        display: block !important;
+        width: 100% !important;
+    }
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #ceec-order-summary-wrapper {
+        grid-column: 2 / span 1 !important;
+        display: block !important;
+        width: 100% !important;
+    }
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-billing-fields,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-shipping-fields,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-additional-fields,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-checkout-review-order {
+    margin-bottom: 30px !important;
+    float: none !important;
+    width: 100% !important;
+    clear: both !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+/* Reset for headings */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-billing-fields h3,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-shipping-fields h3,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-additional-fields h3,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-checkout-review-order h3,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #order_review_heading {
+    margin: 0 0 20px 0 !important;
+    color: inherit !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    padding-bottom: 0 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    float: none !important;
+    width: 100% !important;
+    line-height: 1.2 !important;
+}
+
+/* Order summary wrapper: heading and order review stay together in one grid cell */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #ceec-order-summary-wrapper #order_review_heading {
+    margin-bottom: 8px !important;
+    padding: 0 !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #ceec-order-summary-wrapper #order_review {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row {
+    margin: 0 0 15px 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    width: 100% !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row label {
+    display: block !important;
+    margin-bottom: 5px !important;
+    font-weight: 600 !important;
+    color: #444 !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    float: none !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input.input-text,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input[type="text"],
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input[type="email"],
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input[type="tel"],
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input[type="number"],
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row select,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row textarea {
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 10px 12px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    background-color: #fff !important;
+    color: #333 !important;
+    box-shadow: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    box-sizing: border-box !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    padding-right: 36px !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input:focus,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row select:focus,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row textarea:focus {
+    outline: none !important;
+    border-color: #007cba !important;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1) !important;
+}
+/* Select2 dropdowns inside checkout (e.g. country/state) */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row .select2-container .select2-selection--single {
+    min-height: 44px !important;
+    padding: 8px 12px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    background-color: #fff !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row .select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 26px !important;
+    padding-left: 0 !important;
+}
+
+/* Fix Checkout Customer Details Column Layout
+   - Keep all customer details stacked in the left grid column (no empty half column)
+   - Works reliably across browsers without :has() or visibility hacks */
+@media (min-width: 768px) {
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .col2-set {
+        display: block !important;
+        margin: 0 !important;
+        float: none !important;
+        width: 100% !important;
+    }
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .col2-set .col-1,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .col2-set .col-2 {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        float: none !important;
+    }
+}
+
+
+/* WooCommerce JS adds this class when the checkbox is checked */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .shipping-address-active .shipping_address,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #ship-to-different-address-checkbox:checked ~ * .shipping_address {
+    display: block !important;
+}
+
+/* Fix Form Row Layouts (First/Last fields side-by-side) */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row-first {
+    width: 48% !important;
+    float: left !important;
+    clear: left !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row-last {
+    width: 48% !important;
+    float: right !important;
+    clear: none !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row-wide {
+    width: 100% !important;
+    float: none !important;
+    clear: both !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout::after,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-billing-fields::after,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-shipping-fields::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .woocommerce-checkout-payment {
+    background: #f8f9fa !important;
+    padding: 24px !important;
+    border-radius: 8px !important;
+    border: 1px solid #e1e5e9 !important;
+    margin-top: 30px !important;
+}
+
+/* Payment method list: align radio + label in a row (input and label are siblings in WC) */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods {
+    list-style: none !important;
+    margin: 0 0 16px 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods li.wc_payment_method {
+    list-style: none !important;
+    margin: 0 0 16px 0 !important;
+    padding: 0 0 16px 0 !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods li.wc_payment_method:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods li.wc_payment_method > input[type="radio"] {
+    flex-shrink: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 10px 0 0 !important;
+    accent-color: #2ea2cc !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods li.wc_payment_method > label {
+    flex: 1 1 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    color: #2c2d33 !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    min-height: 24px !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods li.wc_payment_method .payment_method_icons {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout ul.wc_payment_methods li.wc_payment_method > .payment_box {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    margin: 12px 0 0 0 !important;
+    padding: 12px !important;
+    background: #fff !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+    color: #2c2d33 !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .place-order {
+    margin-top: 24px !important;
+    padding: 0 !important;
+    float: none !important;
+    width: 100% !important;
+}
+
+/* Keep WooCommerce defaults for place order button — no forced colors */
+
+/* Astra/Neve strong overrides: restore Woo default button styles inside wrapper */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout a.button,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout button.button,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout input.button,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout #place_order {
+    background: #2ea2cc !important;
+    color: #fff !important;
+    border: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    border-radius: 3px !important;
+    padding: 12px 20px !important;
+    line-height: 1.5 !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout a.button.alt,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout button.button.alt,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout input.button.alt {
+    background: #a46497 !important; /* Woo alt color */
+    color: #fff !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row input.input-text,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row select,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .form-row textarea {
+    background: #fff !important;
+    color: #2c2d33 !important;
+    border: 1px solid #d9d9d9 !important;
+    border-radius: 3px !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .shop_table td {
+    border-color: #e5e5e5 !important;
+    color: #2c2d33 !important;
+}
+
+/* --- END DISABLED CSS --- */
+
+/* ============================================================
+   Quantity Stepper Styles
+   ============================================================ */
+
+.coderembassy-product-quantity {
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    transition: max-height 0.28s ease, opacity 0.18s ease, padding-top 0.28s ease !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    border-top: 1px solid transparent !important;
+}
+
+.coderembassy-product-item.selected .coderembassy-product-quantity,
+.coderembassy-product-quantity.active {
+    max-height: 80px !important;
+    opacity: 1 !important;
+    padding-top: 8px !important;
+    margin-top: 8px !important;
+    border-top-color: #e9ecef !important;
+}
+
+/* Quantity stepper on shortcode page – ensure visibility and styling apply */
+.woocommerce-checkout .coderembassy-product-quantity,
+.woocommerce-page .coderembassy-product-quantity {
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    transition: max-height 0.28s ease, opacity 0.18s ease, padding-top 0.28s ease !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    border-top: 1px solid transparent !important;
+}
+
+.woocommerce-checkout .coderembassy-product-item.selected .coderembassy-product-quantity,
+.woocommerce-checkout .coderembassy-product-quantity.active,
+.woocommerce-page .coderembassy-product-item.selected .coderembassy-product-quantity,
+.woocommerce-page .coderembassy-product-quantity.active {
+    max-height: 80px !important;
+    opacity: 1 !important;
+    padding-top: 8px !important;
+    margin-top: 8px !important;
+    border-top-color: #e9ecef !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-label,
+.woocommerce-page .coderembassy-qty-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #555 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+    float: none !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-controls,
+.woocommerce-page .coderembassy-qty-controls {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    flex-wrap: nowrap !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-btn,
+.woocommerce-page .coderembassy-qty-btn {
+    background: #f8f9fa !important;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    font-size: 15px !important;
+    line-height: 28px !important;
+    cursor: pointer !important;
+    color: #007cba !important;
+    font-weight: 700 !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    float: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-btn:hover,
+.woocommerce-page .coderembassy-qty-btn:hover {
+    background: #007cba !important;
+    color: #fff !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-btn:active,
+.woocommerce-page .coderembassy-qty-btn:active {
+    background: #005a87 !important;
+    color: #fff !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-input,
+.woocommerce-page .coderembassy-qty-input {
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    text-align: center !important;
+    padding: 4px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    outline: none !important;
+    box-shadow: none !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+    float: none !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-input::-webkit-outer-spin-button,
+.woocommerce-checkout .coderembassy-qty-input::-webkit-inner-spin-button,
+.woocommerce-page .coderembassy-qty-input::-webkit-outer-spin-button,
+.woocommerce-page .coderembassy-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-input:focus,
+.woocommerce-page .coderembassy-qty-input:focus {
+    background: #f0f8ff !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.coderembassy-qty-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #555 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+    float: none !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.coderembassy-qty-controls {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    flex-wrap: nowrap !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.coderembassy-qty-btn {
+    background: #f8f9fa !important;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    font-size: 15px !important;
+    line-height: 28px !important;
+    cursor: pointer !important;
+    color: #007cba !important;
+    font-weight: 700 !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    float: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.coderembassy-qty-btn:hover {
+    background: #007cba !important;
+    color: #fff !important;
+}
+
+.coderembassy-qty-btn:active {
+    background: #005a87 !important;
+    color: #fff !important;
+}
+
+.coderembassy-qty-input {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    border: none !important;
+    border-left: 1px solid #dee2e6 !important;
+    border-right: 1px solid #dee2e6 !important;
+    border-radius: 0 !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    outline: none !important;
+    box-shadow: none !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+    float: none !important;
+}
+
+.coderembassy-qty-input::-webkit-outer-spin-button,
+.coderembassy-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+.coderembassy-qty-input:focus {
+    background: #f0f8ff !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .woocommerce-checkout .coderembassy-qty-btn,
+    .woocommerce-page .coderembassy-qty-btn {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        font-size: 13px !important;
+    }
+    .woocommerce-checkout .coderembassy-qty-input,
+    .woocommerce-page .coderembassy-qty-input {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        height: 26px !important;
+        font-size: 12px !important;
+    }
+    .coderembassy-qty-btn {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        font-size: 13px !important;
+    }
+    .coderembassy-qty-input {
+        width: 34px !important;
+        min-width: 34px !important;
+        height: 26px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* ========================================================= */
+/* Custom Confirmation Modal                                   */
+/* ========================================================= */
+
+.coderembassy-confirm-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
-    border-radius: 6px;
-    border: 1px solid #e1e5e9;
 }
 
-.coderembassy-checkout-form .place-order {
-    margin-top: 20px;
+.coderembassy-confirm-modal {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 100%;
+    overflow: hidden;
+    animation: coderembassyModalFadeIn 0.2s ease-out;
 }
 
-.coderembassy-checkout-form .place-order .button {
+@keyframes coderembassyModalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.coderembassy-confirm-message {
+    padding: 24px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.coderembassy-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    background: #fafafa;
+    gap: 12px;
+}
+
+.coderembassy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    line-height: 1.5;
+}
+
+.coderembassy-btn-secondary {
+    background: #fff;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.coderembassy-btn-secondary:hover {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #ccc;
+}
+
+.coderembassy-btn-primary {
     background: #007cba;
     color: #fff;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
+    border: 1px solid #007cba;
 }
 
-.coderembassy-checkout-form .place-order .button:hover {
-    background: #005a87;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+.coderembassy-btn-primary:hover {
+    background: #006ba1;
+    border-color: #006ba1;
 }
+
+/* ============================================================
+   Theme Isolation – Woodmart & other aggressive WooCommerce themes
+   ============================================================
+   Woodmart scopes heavy styling to .woocommerce-checkout (body class)
+   and form.woocommerce-checkout (the <form>). Because we add the
+   woocommerce-checkout body class to load gateway assets, all of
+   Woodmart's checkout CSS cascades onto OUR product grid/cards.
+   The rules below use high-specificity + !important to shield
+   our own components from theme interference.
+   ============================================================ */
+
+/* ---- Product Grid: keep CSS-Grid, block Woodmart's flex reset ---- */
+.woocommerce-checkout .coderembassy-express-checkout .coderembassy-products-grid,
+.woocommerce-page .coderembassy-express-checkout .coderembassy-products-grid {
+    display: grid !important;
+    flex-wrap: unset !important;
+    flex-direction: unset !important;
+    margin-bottom: 30px !important;
+}
+
+/* ---- Product Card: keep our flex-column card layout ---- */
+.woocommerce-checkout .coderembassy-product-item,
+.woocommerce-page .coderembassy-product-item {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: none !important;              /* block Woodmart's "flex: 1 1 100%" */
+    order: unset !important;            /* block Woodmart's "order: -1" */
+    width: auto !important;             /* respect grid cell, not 100% */
+    position: relative !important;
+    border: 2px solid #e1e5e9 !important;
+    border-radius: 12px !important;
+    padding: 15px !important;
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07) !important;
+    overflow: visible !important;
+}
+
+.woocommerce-checkout .coderembassy-product-item:hover,
+.woocommerce-page .coderembassy-product-item:hover {
+    border-color: #007cba !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ---- Sale Badge ---- */
+.woocommerce-checkout .coderembassy-product-sale-badge,
+.woocommerce-page .coderembassy-product-sale-badge {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    background: #ff6b6b !important;
+    color: #fff !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    z-index: 5 !important;
+    display: block !important;
+}
+
+/* ---- Checkbox / Radio inside product cards ---- */
+.woocommerce-checkout .coderembassy-product-checkbox,
+.woocommerce-page .coderembassy-product-checkbox {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 10 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-checkbox input[type="checkbox"],
+.woocommerce-checkout .coderembassy-product-checkbox input[type="radio"],
+.woocommerce-page .coderembassy-product-checkbox input[type="checkbox"],
+.woocommerce-page .coderembassy-product-checkbox input[type="radio"] {
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    z-index: 2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-checkbox label,
+.woocommerce-page .coderembassy-product-checkbox label {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 4px !important;
+    background: #fff !important;
+    cursor: pointer !important;
+    position: relative !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-checkbox input[type="radio"] + label,
+.woocommerce-page .coderembassy-product-checkbox input[type="radio"] + label {
+    border-radius: 50% !important;
+}
+
+.woocommerce-checkout .coderembassy-product-checkbox input:checked + label,
+.woocommerce-page .coderembassy-product-checkbox input:checked + label {
+    background: #007cba !important;
+    border-color: #007cba !important;
+}
+
+/* ---- Product Image ---- */
+.woocommerce-checkout .coderembassy-product-image,
+.woocommerce-page .coderembassy-product-image {
+    text-align: center !important;
+    margin-bottom: 12px !important;
+    flex-shrink: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-image img,
+.woocommerce-page .coderembassy-product-image img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* ---- Product Body & Title ---- */
+.woocommerce-checkout .coderembassy-product-body,
+.woocommerce-page .coderembassy-product-body {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.woocommerce-checkout .coderembassy-product-title,
+.woocommerce-page .coderembassy-product-title {
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    line-height: 1.4 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-title a,
+.woocommerce-page .coderembassy-product-title a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* ---- Product Footer (Price + Qty) ---- */
+.woocommerce-checkout .coderembassy-product-footer,
+.woocommerce-page .coderembassy-product-footer {
+    flex-shrink: 0 !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid #f0f0f0 !important;
+}
+
+.woocommerce-checkout .coderembassy-product-price,
+.woocommerce-page .coderembassy-product-price {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #007cba !important;
+}
+
+/* ---- Quantity Controls ---- */
+.woocommerce-checkout .coderembassy-qty-controls,
+.woocommerce-page .coderembassy-qty-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-input,
+.woocommerce-page .coderembassy-qty-input {
+    width: 60px !important;
+    text-align: center !important;
+    padding: 4px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+}
+
+.woocommerce-checkout .coderembassy-qty-btn,
+.woocommerce-page .coderembassy-qty-btn {
+    width: 28px !important;
+    height: 28px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    background: #f8f9fa !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    color: #333 !important;
+}
+
+/* ---- Add to Cart Button ---- */
+.woocommerce-checkout .coderembassy-actions,
+.woocommerce-page .coderembassy-actions {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    text-align: right !important;
+    padding: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+}
+
+.woocommerce-checkout .coderembassy-add-to-cart-btn,
+.woocommerce-page .coderembassy-add-to-cart-btn {
+    background: #007cba !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 12px 30px !important;
+    border-radius: 6px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* ---- Container wrapper ---- */
+.woocommerce-checkout .coderembassy-express-checkout,
+.woocommerce-page .coderembassy-express-checkout {
+    border: 1px solid #e1e5e9 !important;
+    border-radius: 8px !important;
+    background-color: #f8f9fa !important;
+    padding: 20px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    display: block !important;         /* not flex! */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+}
+
+/* ---- Checkout Section ---- */
+.woocommerce-checkout .coderembassy-checkout-section,
+.woocommerce-page .coderembassy-checkout-section {
+    display: block !important;
+    flex: none !important;
+    order: unset !important;
+    width: auto !important;
+}
+
+/* ============================================================
+   WoodMart theme: order review table wrapper
+   ============================================================ */
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .checkout-order-review .wd-table-wrapper,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .wd-table-wrapper {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .checkout-order-review .shop_table,
+body.ceec-compat-css #ceec-custom-checkout-wrapper.coderembassy-custom-layout .checkout-order-review .woocommerce-checkout-review-order-table {
+    width: 100% !important;
+    margin: 0 0 1em 0 !important;
+}
+

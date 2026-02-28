@@ -9,7 +9,8 @@
         initAdminTabs();
         initProductSelector();
         initDesignOptions();
-        initCopyButton();
+        initMetaboxCopyButton();
+        initColumnCopyButton();
         initFormSubmission();
         
         // Reinitialize Select2 after a short delay to fix sizing issues
@@ -290,7 +291,7 @@
         });
     }
 
-    function initCopyButton() {
+    function initMetaboxCopyButton() {
         // Copy button functionality
         $(document).on('click', '.coderembassy-copy-btn', function() {
             var $button = $(this);
@@ -338,8 +339,8 @@
         }
     });
 
-    // Initialize copy button functionality
-    function initCopyButton() {
+    // Initialize copy button functionality for columns
+    function initColumnCopyButton() {
         $(document).on('click', '.coderembassy-copy-shortcode-btn', function(e) {
             e.preventDefault();
             
@@ -378,10 +379,7 @@
         });
     }
 
-    // Initialize on page load
-    initAdminTabs();
-    initProductSelector();
-    initDesignOptions();
-    initCopyButton();
+    // Event delegation ensures these work even if elements are added dynamically
+    // (though these specific ones are mostly for static elements in admin)
 
 })(jQuery);

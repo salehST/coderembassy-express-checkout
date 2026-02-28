@@ -2,9 +2,9 @@
 Contributors: codersaleh, phpcoderhannan, fazlebari
 Tags: checkout, express checkout, one-click checkout, quick buy
 Requires at least: 5.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,10 @@ Coderembassy express checkout plugin that allows customers to instantly add prod
 It allows customers to **add products to checkout with a single click** — skipping the traditional cart process.
 
 Perfect for digital products, quick purchases, or flash sale events.
+
+🌐[Demo](https://plugin.coderembassy.com/coderembassy-express-checkout-demo/)| 📄[Documentation](https://plugin.coderembassy.com/docs/) 🚀 |[Get Pro Version](https://plugin.coderembassy.com/express-checkout-landing/)
+
+https://www.youtube.com/watch?v=o7mnPtg6QsI&list=PLKHOA0nBvh9Codg8OXb4T2bKF_wR_F8qW&index=6
 
 ### 💡 Key Features
 – Enable express checkout buttons anywhere using shortcode.
@@ -71,6 +75,12 @@ It’s tested with most popular WooCommerce themes and should work with any them
 3. Checkout popup / redirect example.
 
 == Changelog ==
+
+= 1.0.1 - 22-02-2026 =
+
+* Fixed Shortcode copy button issue.
+* Fixed Stripe Display field in checkout page issue.
+* Compatible With Strip
 
 = 1.0.0 =
 
