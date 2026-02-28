@@ -66,6 +66,9 @@ class Plugin
         // Trick gateways during AJAX checkout requests (like update_order_review) so they return payment fields
         add_filter('woocommerce_is_checkout', array($this, 'is_checkout_override_for_ajax'));
 
+        // PayPal (WooCommerce PayPal Payments): ensure scripts load on our shortcode page
+        add_filter('woocommerce_paypal_payments_should_enqueue_scripts', array($this, 'paypal_should_enqueue_scripts'));
+
         // Add checkout body classes to ensure themes apply layout styles correctly
         add_filter('body_class', array($this, 'add_checkout_body_class'));
         
@@ -86,6 +89,34 @@ class Plugin
         // Wrap "Your order" heading + order review in one div so the grid has a single column-2 cell
         add_action('woocommerce_checkout_before_order_review_heading', array($this, 'wrap_order_review_open'), 1);
         add_action('woocommerce_checkout_after_order_review', array($this, 'wrap_order_review_close'), 999);
+
+        // Output notices again after payment section on our pages so gateway-added notices appear
+        add_action('woocommerce_review_order_after_payment', array($this, 'output_payment_notices'), 5);
+
+        // Fire custom action so gateway plugins (PayPal, etc.) can enqueue scripts on our page
+        add_action('wp_enqueue_scripts', array($this, 'fire_gateway_script_hook'), 99999);
+    }
+
+    /**
+     * Fire action for gateway plugins to enqueue checkout scripts on our shortcode page.
+     * Plugins can hook: add_action('coderembassy_express_checkout_enqueue_gateway_scripts', ...)
+     */
+    public function fire_gateway_script_hook() {
+        if ($this->is_our_checkout_page()) {
+            do_action('coderembassy_express_checkout_enqueue_gateway_scripts');
+        }
+    }
+
+    /**
+     * Output WooCommerce notices after the payment section.
+     * WooCommerce outputs notices at woocommerce_before_checkout_form (before payment).
+     * Payment gateways add notices during payment_fields, so those are added later.
+     * This ensures notices from gateways (e.g. Stripe config errors) show in the payment section.
+     */
+    public function output_payment_notices() {
+        if ($this->is_our_checkout_page() && function_exists('woocommerce_output_all_notices')) {
+            woocommerce_output_all_notices();
+        }
     }
 
     /**
@@ -196,6 +227,17 @@ class Plugin
     }
 
     /**
+     * WooCommerce PayPal Payments: ensure PayPal/Google Pay scripts load on our shortcode page.
+     * The plugin may check is_checkout() or use this filter to decide whether to enqueue.
+     */
+    public function paypal_should_enqueue_scripts($should_enqueue) {
+        if ($this->is_our_checkout_page()) {
+            return true;
+        }
+        return $should_enqueue;
+    }
+
+    /**
      * Override is_checkout during AJAX requests so payment gateways render correctly
      */
     public function is_checkout_override_for_ajax($is_checkout) {
@@ -217,6 +259,26 @@ class Plugin
         return $is_checkout;
     }
     
+    /**
+     * Explicitly enqueue woo-stripe-payment checkout scripts and styles.
+     * Ensures Stripe Elements (card fields) load on our shortcode page when
+     * the normal payment_fields path might not run early enough.
+     */
+    private function enqueue_woo_stripe_checkout_scripts() {
+        if (!function_exists('stripe_wc') || !WC()->payment_gateways()) {
+            return;
+        }
+        $scripts = stripe_wc()->scripts();
+        if (!$scripts) {
+            return;
+        }
+        foreach (WC()->payment_gateways()->payment_gateways() as $gateway) {
+            if ($gateway instanceof \WC_Payment_Gateway_Stripe && $gateway->is_available()) {
+                $gateway->enqueue_frontend_scripts('checkout');
+            }
+        }
+    }
+
     /**
      * Add woocommerce-checkout and optional compatibility body classes
      */
@@ -323,6 +385,14 @@ class Plugin
             do_action('woocommerce_frontend_scripts');
             do_action('woocommerce_enqueue_styles');
             remove_filter('woocommerce_is_checkout', '__return_true');
+
+            // Explicitly enqueue woo-stripe-payment checkout scripts on our shortcode page.
+            // The plugin normally enqueues via payment_fields (which runs when checkout form renders),
+            // but it checks is_checkout() which can be false before our filter runs in some contexts.
+            // This ensures Stripe Elements (card fields) load and render correctly.
+            if ($has_shortcode && class_exists('WC_Payment_Gateway_Stripe')) {
+                $this->enqueue_woo_stripe_checkout_scripts();
+            }
         }
 
         wp_enqueue_script(
@@ -395,6 +465,11 @@ class Plugin
                 'addingToCart' => esc_html__('Adding to cart...', 'coderembassy-express-checkout'),
                 'addedToCart' => esc_html__('Added to cart!', 'coderembassy-express-checkout'),
                 'error' => esc_html__('An error occurred. Please try again.', 'coderembassy-express-checkout'),
+            ),
+            'paymentNotices' => array(
+                'stripeKeyError' => __('There was an error registering the payment method with id \'stripe_cc\': Error: Please call Stripe() with your publishable key. You used an empty string.', 'coderembassy-express-checkout'),
+                'gatewayInitError' => __('There was an error registering the payment method. Please check your payment gateway configuration (e.g. Stripe publishable key) in WooCommerce → Settings → Payments.', 'coderembassy-express-checkout'),
+                'noPaymentMethods' => __('There are no payment methods available. Please contact us for help placing your order.', 'coderembassy-express-checkout'),
             )
         ));
 

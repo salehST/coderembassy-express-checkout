@@ -5,6 +5,55 @@
 (function ($) {
     'use strict';
 
+    // Catch payment gateway initialization errors and display them (like default WooCommerce checkout)
+    // woo-stripe-payment catches Stripe() errors but only logs to console - never shows user.
+    // We catch unhandled errors and inject notices so users get the same feedback as default checkout.
+    var ceecPaymentErrorShown = false;
+    var ceecPaymentErrorMessages = [];
+
+    function ceecInjectPaymentErrorNotices(includeNoMethodsMsg) {
+        if (!ceecPaymentErrorMessages.length || !$('.coderembassy-express-checkout').length || !$('#payment').length) return;
+        var $existing = $('#payment .ceec-payment-error-notice');
+        if ($existing.length) return;
+        var notices = (typeof coderembassyData !== 'undefined' && coderembassyData.paymentNotices) ? coderembassyData.paymentNotices : {};
+        var items = ceecPaymentErrorMessages.map(function (m) {
+            return '<li>' + $('<div>').text(m).html() + '</li>';
+        });
+        var hasWorkingMethod = false;
+        if (includeNoMethodsMsg !== false) {
+            $('#payment .wc_payment_methods .wc_payment_method').each(function () {
+                var $box = $(this).find('.payment_box');
+                if (!$box.length) return;
+                var hasContent = $box.find('iframe').length > 0 ||
+                    $box.find('input[type="text"], input[type="tel"], .StripeElement, [id*="card-element"]').length > 0 ||
+                    $box.text().trim().length > 30;
+                if (hasContent) { hasWorkingMethod = true; return false; }
+            });
+        }
+        if (includeNoMethodsMsg !== false && !hasWorkingMethod) {
+            var noMethodsMsg = notices.noPaymentMethods || 'There are no payment methods available. Please contact us for help placing your order.';
+            items.push('<li>' + $('<div>').text(noMethodsMsg).html() + '</li>');
+        }
+        var html = '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout ceec-payment-error-notice"><ul class="woocommerce-error">' + items.join('') + '</ul></div>';
+        $('#payment').prepend(html);
+    }
+
+    window.addEventListener('error', function (e) {
+        if (ceecPaymentErrorShown) return;
+        var msg = (e.message || '') + (e.error && e.error.message ? ' ' + e.error.message : '');
+        var isPaymentError = /IntegrationError|publishable key|empty string|Cannot read properties of null.*elements|payment_method|stripe|wc-stripe/i.test(msg);
+        if (!isPaymentError) return;
+        if (!$('.coderembassy-express-checkout').length || !$('#payment').length) return;
+
+        ceecPaymentErrorShown = true;
+        var notices = (typeof coderembassyData !== 'undefined' && coderembassyData.paymentNotices) ? coderembassyData.paymentNotices : {};
+        var noticeMsg = msg.indexOf('publishable key') > -1
+            ? (notices.stripeKeyError || "There was an error registering the payment method with id 'stripe_cc': Error: Please call Stripe() with your publishable key. You used an empty string.")
+            : msg;
+        ceecPaymentErrorMessages = [noticeMsg];
+        ceecInjectPaymentErrorNotices();
+    });
+
     $(document).ready(function () {
         initExpressCheckout();
     });
@@ -100,126 +149,87 @@
             // Sync product card state (checked + qty) from WooCommerce cart on page load
             syncCartStateOnLoad($container);
 
-            // Ensure WooCommerce checkout and gateways (e.g., Stripe) initialize on shortcode pages
+            // Ensure WooCommerce checkout and payment gateways initialize (same behavior as default checkout)
             var $checkoutForm = $('form.checkout');
             if ($checkoutForm.length) {
-                // Trigger Woo init and update cycles
+                $(document.body).on('init_checkout updated_checkout', function () {
+                    if (ceecPaymentErrorShown) {
+                        setTimeout(ceecInjectPaymentErrorNotices, 50);
+                    }
+                });
                 setTimeout(function () {
                     $(document.body).trigger('init_checkout');
                     $checkoutForm.trigger('update_checkout');
-                    // Retrigger selected payment method to mount gateway fields
                     var $selectedMethod = $checkoutForm.find('input[name="payment_method"]:checked');
                     if ($selectedMethod.length) {
                         $selectedMethod.trigger('click').trigger('change');
                     }
-                    renderGatewayDiagnostics();
-                    // Re-attach on future checkout updates
-                    $(document.body).on('updated_checkout payment_method_selected', function () {
-                        renderGatewayDiagnostics();
-                        watchStripeMountFailure();
-                    });
-                    watchStripeMountFailure();
+
+                    // If Stripe card fields haven't mounted after 1.5s, trigger update_checkout retry
+                    setTimeout(function () {
+                        var $stripeCc = $('#payment .payment_method_stripe_cc .payment_box');
+                        if ($stripeCc.length && $stripeCc.find('iframe').length === 0 && $checkoutForm.length) {
+                            $(document.body).trigger('update_checkout');
+                        }
+                    }, 1500);
+
+                    // After 2.5s, trigger update_checkout to refresh PayPal, Google Pay, MobilePay.
+                    // These gateways render buttons via JS; a delayed refresh gives scripts time to load.
+                    setTimeout(function () {
+                        var hasAltMethods = $('#payment .payment_method_ppcp, #payment .payment_method_ppcp_googlepay, #payment .payment_method_stripe_mobilepay, #payment .payment_method_stripe_googlepay').length > 0;
+                        if (hasAltMethods && $checkoutForm.length && !$('body').hasClass('processing')) {
+                            $(document.body).trigger('update_checkout');
+                        }
+                    }, 2500);
+
+                    // Fallback: if payment fields never mount (e.g. gateway init failed), show notice
+                    setTimeout(function () {
+                        ceecShowPaymentInitErrorIfNeeded();
+                    }, 3000);
                 }, 50);
             }
         });
     }
 
-    function renderGatewayDiagnostics() {
-        var $diag = $('#ceec-payment-diagnostics');
-        if (!$diag.length) return;
+    /**
+     * If a payment method (e.g. Stripe) failed to mount its input fields, show a notice.
+     * Only runs when NO payment methods are working - not when PayPal/Google Pay etc. work.
+     */
+    function ceecShowPaymentInitErrorIfNeeded() {
+        if (ceecPaymentErrorShown) return;
+        if (!$('.coderembassy-express-checkout').length || !$('#payment').length) return;
 
-        var errorsData = $diag.data('errors');
-        var gatewayId = $diag.data('gateway-id') || 'stripe_cc';
-        var messages = [];
-        try {
-            if (typeof errorsData === 'string') {
-                messages = JSON.parse(errorsData);
-            } else if (Array.isArray(errorsData)) {
-                messages = errorsData;
-            }
-        } catch (e) {}
-        if (!messages || !messages.length) return;
+        var $methods = $('#payment .wc_payment_methods .wc_payment_method');
+        var hasWorkingMethod = false;
+        var cardMethodFailed = false;
 
-        // Find the payment method input by id or by value and climb to its <li>
-        var $methodInput = $('#payment_method_' + gatewayId);
-        if (!$methodInput.length) {
-            $methodInput = $('input[name="payment_method"][value="' + gatewayId + '"]');
-        }
-        if (!$methodInput.length) {
-            $methodInput = $('input[name="payment_method"][value*="stripe"]').first();
-        }
-        if (!$methodInput.length) return;
-        var $methodLi = $methodInput.closest('li.wc_payment_method');
-        if (!$methodLi.length) $methodLi = $methodInput.closest('li');
-
-        // Remove previous injected notices
-        $methodLi.find('.ceec-gateway-error').remove();
-
-        var html = '<ul class="woocommerce-error ceec-gateway-error" style="margin-top:10px">';
-        messages.forEach(function (m) {
-            html += '<li>' + $('<div>').text(m).html() + '</li>';
-        });
-        html += '</ul>';
-
-        // Prefer appending inside payment_box if available, else right after label
-        var methodClass = 'payment_method_' + (gatewayId || '').toString();
-        var $target = $methodLi.find('.payment_box.' + methodClass).first();
-        if (!$target.length) $target = $methodLi.find('.payment_box').first();
-        if ($target.length) {
-            $target.append(html);
-        } else {
-            var $label = $methodLi.find('label').first();
-            if ($label.length) {
-                $(html).insertAfter($label);
-            } else {
-                $methodLi.append(html);
-            }
-        }
-    }
-
-    // If Stripe Elements fails to mount (e.g., empty publishable key), show a visible error under the Stripe method
-    function watchStripeMountFailure() {
-        // Look for any Stripe payment method input and climb to li
-        var $input = $('input[name="payment_method"][value*="stripe"]').first();
-        if (!$input.length) return;
-        var $li = $input.closest('li.wc_payment_method');
-        if (!$li.length) $li = $input.closest('li');
-        var attempts = 0;
-        var maxAttempts = 30; // ~3s
-        var interval = setInterval(function () {
-            attempts++;
+        $methods.each(function () {
+            var $li = $(this);
+            var id = $li.find('input[name="payment_method"]').val() || '';
             var $box = $li.find('.payment_box');
-            var $element = $box.find('#wc-stripe-card-element, .wc-stripe-card-element, .wc-stripe-elements-field, .ElementsApp, iframe[name^="__privateStripeFrame"]');
-            var hasIframe = $element.find('iframe').length > 0;
-            // Detect missing keys by checking plugin-provided hidden inputs
-            var $keyInputs = $box.find('input[id*="publishable"], input[id$="_token_key"], input[id$="_payment_intent_key"]');
-            var hasAnyKeyValue = false;
-            $keyInputs.each(function () {
-                var v = ('' + ($(this).val() || '')).trim();
-                if (v.length > 0) {
-                    hasAnyKeyValue = true;
-                    return false;
-                }
-            });
-            var hasError = $li.find('.ceec-gateway-error').length > 0;
-            if (hasIframe || hasError || attempts >= maxAttempts) {
-                if (!hasIframe && !hasError) {
-                    var msg = hasAnyKeyValue
-                        ? 'Stripe could not load card fields. Please try reloading the page.'
-                        : 'There was an error registering the payment method: Please call Stripe() with your publishable key. You used an empty string.';
-                    var html = '<ul class="woocommerce-error ceec-gateway-error" style="margin-top:10px"><li>' +
-                        msg +
-                        '</li></ul>';
-                    if ($box.length) {
-                        $box.append(html);
-                    } else {
-                        $li.append(html);
-                    }
-                }
-                clearInterval(interval);
+            if (!$box.length) return;
+            var $iframes = $box.find('iframe');
+            var hasInputs = $box.find('input[type="text"], input[type="tel"], .StripeElement, [id*="card-element"]').length > 0;
+            var boxText = $box.text().trim();
+            var hasContent = $iframes.length > 0 || hasInputs || boxText.length > 30;
+
+            if (hasContent && !/stripe_cc|stripe_mobilepay/i.test(id)) {
+                hasWorkingMethod = true;
             }
-        }, 100);
+            if (/stripe_cc|stripe_mobilepay/i.test(id) && !$iframes.length && !hasInputs && boxText.length < 80) {
+                cardMethodFailed = true;
+            }
+        });
+
+        if (!cardMethodFailed || hasWorkingMethod) return;
+
+        ceecPaymentErrorShown = true;
+        var notices = (typeof coderembassyData !== 'undefined' && coderembassyData.paymentNotices) ? coderembassyData.paymentNotices : {};
+        var msg = notices.stripeKeyError || "There was an error registering the payment method with id 'stripe_cc': Error: Please call Stripe() with your publishable key. You used an empty string.";
+        ceecPaymentErrorMessages = [msg];
+        ceecInjectPaymentErrorNotices();
     }
+
     function initProductCheckboxes($container, quickCart) { // Remove any existing event handlers to prevent duplicates
         $container.find('.coderembassy-product-checkbox-input, .coderembassy-product-radio-input').off('change.coderembassy');
 

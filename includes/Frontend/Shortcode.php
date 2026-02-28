@@ -344,48 +344,7 @@ class Shortcode
                                     do_action('woocommerce_enqueue_styles');
                                 }
 
-                                // Render WooCommerce checkout form
-                                // Use WooCommerce checkout shortcode
-                                $diagnostic_notices = array();
-                                $stripe_gateway_id = 'stripe_cc';
-                                if (function_exists('WC') && WC()) {
-                                    $gateways_obj = WC()->payment_gateways();
-                                    if ($gateways_obj && method_exists($gateways_obj, 'get_available_payment_gateways')) {
-                                        $available_gateways = $gateways_obj->get_available_payment_gateways();
-                                        if (empty($available_gateways)) {
-                                            $diagnostic_notices[] = __('There are no payment methods available. Please contact us for help placing your order.', 'coderembassy-express-checkout');
-                                        } else {
-                                            // Try to detect the Stripe gateway id used by "Payment Plugins for Stripe"
-                                            foreach ($available_gateways as $gw_id => $gw_obj) {
-                                                if (strpos($gw_id, 'stripe') !== false) {
-                                                    $stripe_gateway_id = $gw_id;
-                                                    break;
-                                                }
-                                            }
-                                            if (isset($available_gateways[$stripe_gateway_id])) {
-                                                $g = $available_gateways[$stripe_gateway_id];
-                                                $gw_settings = is_object($g) && isset($g->settings) && is_array($g->settings) ? $g->settings : array();
-                                                $opt_settings = get_option('woocommerce_' . $stripe_gateway_id . '_settings', array());
-                                                $settings = is_array($opt_settings) ? array_merge($gw_settings, $opt_settings) : $gw_settings;
-                                                $testmode = isset($settings['testmode']) ? $settings['testmode'] : (isset($settings['test_mode']) ? $settings['test_mode'] : '');
-                                                $pk = '';
-                                                if ($testmode === 'yes' || $testmode === '1' || $testmode === 1) {
-                                                    $pk = isset($settings['test_publishable_key']) ? $settings['test_publishable_key'] : (isset($settings['test_pk']) ? $settings['test_pk'] : '');
-                                                } else {
-                                                    $pk = isset($settings['publishable_key']) ? $settings['publishable_key'] : (isset($settings['pk']) ? $settings['pk'] : '');
-                                                }
-                                                if (empty($pk)) {
-                                                    /* translators: %1$s: gateway id */
-                                                    $diagnostic_notices[] = sprintf(
-                                                        __('There was an error registering the payment method with id \'%1$s\': Error: Please call Stripe() with your publishable key. You used an empty string.', 'coderembassy-express-checkout'),
-                                                        esc_html($stripe_gateway_id)
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                // We had previously removed the Force Core Checking.
+                                // Render WooCommerce checkout form (same as default checkout page)
                                 echo do_shortcode('[woocommerce_checkout]');
                                 echo '</div>';
                             }

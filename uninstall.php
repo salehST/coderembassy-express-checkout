@@ -20,9 +20,9 @@ $posts = get_posts(array(
     'post_status' => 'any'
 ));
 
-foreach ($posts as $post) {
-    wp_delete_post($post->ID, true);
-}
+// foreach ($posts as $post) {
+//     wp_delete_post($post->ID, true);
+// }
 
 // Flush rewrite rules
 flush_rewrite_rules();
