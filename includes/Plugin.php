@@ -69,6 +69,12 @@ class Plugin
         // PayPal (WooCommerce PayPal Payments): ensure scripts load on our shortcode page
         add_filter('woocommerce_paypal_payments_should_enqueue_scripts', array($this, 'paypal_should_enqueue_scripts'));
 
+        // PayPal button placement: show inline with PayPal option (like default checkout) instead of at end
+        add_filter('woocommerce_paypal_payments_checkout_button_renderer_hook', array($this, 'paypal_checkout_button_renderer_hook'));
+
+        // Stripe card form: hide Country field in Payment Element (billing comes from checkout form)
+        add_filter('wc_stripe_localize_script_credit-card', array($this, 'stripe_cc_hide_billing_address_in_element'), 10, 2);
+
         // Add checkout body classes to ensure themes apply layout styles correctly
         add_filter('body_class', array($this, 'add_checkout_body_class'));
         
@@ -235,6 +241,45 @@ class Plugin
             return true;
         }
         return $should_enqueue;
+    }
+
+    /**
+     * PayPal checkout button: render inside PayPal gateway area (like default checkout)
+     * instead of at the end of the payment section.
+     */
+    public function paypal_checkout_button_renderer_hook($hook) {
+        if ($this->is_our_checkout_page()) {
+            return 'ppcp_start_button_wrapper_ppcp_gateway';
+        }
+        return $hook;
+    }
+
+    /**
+     * Stripe card form: hide Country/billing address in Payment Element on express checkout.
+     * Billing details come from the checkout form instead.
+     *
+     * @param array  $data         Localized script data.
+     * @param string $object_name  Script object name.
+     * @return array
+     */
+    public function stripe_cc_hide_billing_address_in_element($data, $object_name) {
+        if (!$this->is_our_checkout_page()) {
+            return $data;
+        }
+        $opts = isset($data['paymentElementOptions']) ? $data['paymentElementOptions'] : array();
+        if (!is_array($opts)) {
+            $opts = array();
+        }
+        $opts['fields'] = isset($opts['fields']) ? $opts['fields'] : array();
+        if (!is_array($opts['fields'])) {
+            $opts['fields'] = array();
+        }
+        $opts['fields']['billingDetails'] = isset($opts['fields']['billingDetails'])
+            ? (array) $opts['fields']['billingDetails']
+            : array();
+        $opts['fields']['billingDetails']['address'] = 'never';
+        $data['paymentElementOptions'] = $opts;
+        return $data;
     }
 
     /**
