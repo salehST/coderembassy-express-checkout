@@ -4,7 +4,7 @@ Tags: checkout, express checkout, one-click checkout, quick buy
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,10 @@ https://www.youtube.com/watch?v=o7mnPtg6QsI&list=PLKHOA0nBvh9Codg8OXb4T2bKF_wR_F
 – Fully compatible with WooCommerce checkout flow.
 – Lightweight and optimized for performance.
 – Developer-friendly with hooks and filters.
+
+### Compatible With
+– Payment Plugins for Stripe WooCommerce
+ 
 
 ### 🎯 Use Case
 If your customers often buy single items or you want to simplify the checkout process, this plugin helps you **reduce cart abandonment** and **increase conversion rates** by sending users directly to checkout.
@@ -64,6 +68,9 @@ Yes, you can override the CSS or enqueue your own custom stylesheet.
 = Does it require WooCommerce? =
 Yes, WooCommerce must be installed and active.
 
+= Does it support Payment Plugins for Stripe WooCommerce? =
+Yes, Payment Plugins for Stripe WooCommerce is supported.
+
 = Will it work with my theme? =
 It’s tested with most popular WooCommerce themes and should work with any theme following standard WooCommerce templates.
 
@@ -76,10 +83,14 @@ It’s tested with most popular WooCommerce themes and should work with any them
 
 == Changelog ==
 
+= 1.0.2 - 11-03-2026 =
+
+* Fixed Stripe Display field in checkout page issue.
+* Compatible with Payment Plugins for Stripe WooCommerce
+
 = 1.0.1 - 22-02-2026 =
 
 * Fixed Shortcode copy button issue.
-* Fixed Stripe Display field in checkout page issue.
 * Compatible With Strip
 
 = 1.0.0 =
