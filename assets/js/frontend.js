@@ -54,7 +54,34 @@
         ceecInjectPaymentErrorNotices();
     });
 
+    // Diagnostic logging - enable via ?ceec_debug=1 in URL, or window.CEEC_DEBUG = true in console before init
+    var ceecDebugEnabled = (typeof window !== 'undefined' && (
+        window.CEEC_DEBUG ||
+        (typeof coderembassyData !== 'undefined' && coderembassyData.debug) ||
+        (typeof window.location !== 'undefined' && window.location.search.indexOf('ceec_debug=1') !== -1)
+    ));
+    function ceecLog() {
+        if (ceecDebugEnabled) {
+            var args = ['[CEEC]'].concat(Array.prototype.slice.call(arguments));
+            console.log.apply(console, args);
+        }
+    }
+    function ceecWarn() {
+        var args = ['[CEEC]'].concat(Array.prototype.slice.call(arguments));
+        console.warn.apply(console, args);
+    }
+    function ceecError() {
+        var args = ['[CEEC]'].concat(Array.prototype.slice.call(arguments));
+        console.error.apply(console, args);
+    }
+
     $(document).ready(function () {
+        if (ceecDebugEnabled) {
+            window.addEventListener('error', function (e) {
+                ceecError('Global error:', e.message, e.filename, e.lineno, e.colno, e.error);
+            });
+            ceecLog('CEEC debug enabled. Add ?ceec_debug=1 to URL or set window.CEEC_DEBUG=true');
+        }
         initExpressCheckout();
     });
 
@@ -151,24 +178,34 @@
 
             // Ensure WooCommerce checkout and payment gateways initialize (same behavior as default checkout)
             var $checkoutForm = $('form.checkout');
+            ceecLog('Checkout init: form.checkout found=', $checkoutForm.length, 'is_checkout=', typeof wc_checkout_params !== 'undefined');
             if ($checkoutForm.length) {
+                // Listen for checkout events to debug payment section
                 $(document.body).on('init_checkout updated_checkout', function () {
+                    ceecLog('Checkout event:', this.type || 'unknown');
+                    ceecProbePaymentSection();
                     if (ceecPaymentErrorShown) {
                         setTimeout(ceecInjectPaymentErrorNotices, 50);
                     }
                 });
                 setTimeout(function () {
+                    ceecLog('Triggering init_checkout and update_checkout');
                     $(document.body).trigger('init_checkout');
                     $checkoutForm.trigger('update_checkout');
                     var $selectedMethod = $checkoutForm.find('input[name="payment_method"]:checked');
+                    ceecLog('Selected payment method:', $selectedMethod.length ? $selectedMethod.val() : 'none');
                     if ($selectedMethod.length) {
                         $selectedMethod.trigger('click').trigger('change');
                     }
+                    // Probe after a delay to see if Stripe/gateway mounted
+                    setTimeout(ceecProbePaymentSection, 500);
+                    setTimeout(ceecProbePaymentSection, 2000);
 
                     // If Stripe card fields haven't mounted after 1.5s, trigger update_checkout retry
                     setTimeout(function () {
                         var $stripeCc = $('#payment .payment_method_stripe_cc .payment_box');
                         if ($stripeCc.length && $stripeCc.find('iframe').length === 0 && $checkoutForm.length) {
+                            ceecLog('Stripe iframes missing, triggering update_checkout retry');
                             $(document.body).trigger('update_checkout');
                         }
                     }, 1500);
@@ -178,6 +215,7 @@
                     setTimeout(function () {
                         var hasAltMethods = $('#payment .payment_method_ppcp, #payment .payment_method_ppcp_googlepay, #payment .payment_method_stripe_mobilepay, #payment .payment_method_stripe_googlepay').length > 0;
                         if (hasAltMethods && $checkoutForm.length && !$('body').hasClass('processing')) {
+                            ceecLog('Triggering update_checkout for PayPal/Google Pay/MobilePay');
                             $(document.body).trigger('update_checkout');
                         }
                     }, 2500);
@@ -187,6 +225,8 @@
                         ceecShowPaymentInitErrorIfNeeded();
                     }, 3000);
                 }, 50);
+            } else {
+                ceecWarn('Checkout form not found - payment section may not load');
             }
         });
     }
@@ -228,6 +268,43 @@
         var msg = notices.stripeKeyError || "There was an error registering the payment method with id 'stripe_cc': Error: Please call Stripe() with your publishable key. You used an empty string.";
         ceecPaymentErrorMessages = [msg];
         ceecInjectPaymentErrorNotices();
+    }
+
+    /**
+     * Probe payment section for debugging - logs DOM state of Stripe/gateway elements
+     */
+    function ceecProbePaymentSection() {
+        if (!ceecDebugEnabled) return;
+        try {
+            var $payment = $('#payment');
+            var $methods = $('.wc_payment_methods .wc_payment_method');
+            var info = {
+                paymentDiv: $payment.length,
+                paymentMethods: $methods.length,
+                methods: {},
+                scripts: {
+                    wc_checkout_params: typeof wc_checkout_params !== 'undefined',
+                    Stripe: typeof Stripe !== 'undefined',
+                    jQuery: typeof $ !== 'undefined'
+                }
+            };
+            $methods.each(function () {
+                var $li = $(this);
+                var id = $li.find('input[name="payment_method"]').val() || 'unknown';
+                var $box = $li.find('.payment_box');
+                var $stripeEl = $box.find('#wc-stripe-card-element, .wc-stripe-card-element, [id*="stripe"], [class*="stripe"]');
+                var $iframes = $box.find('iframe');
+                info.methods[id] = {
+                    paymentBox: $box.length,
+                    stripeElements: $stripeEl.length,
+                    iframes: $iframes.length,
+                    boxHasContent: $box.length ? $box.text().trim().length > 0 : false
+                };
+            });
+            ceecLog('Payment section probe:', JSON.stringify(info, null, 2));
+        } catch (err) {
+            ceecError('Probe error:', err);
+        }
     }
 
     function initProductCheckboxes($container, quickCart) { // Remove any existing event handlers to prevent duplicates
