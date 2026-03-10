@@ -1439,11 +1439,65 @@
         return $('.coderembassy-checkout-section').first();
     }
 
+    /**
+     * Initialize payment method visibility and ensure one method is selected.
+     * Required when checkout form is injected via AJAX (WC checkout.js bound to the old form).
+     */
+    function ceecInitPaymentMethods($container) {
+        var $payment_methods = $container.find('input[name="payment_method"]');
+        if ($payment_methods.length === 0) {
+            return;
+        }
+        if ($payment_methods.filter(':checked').length === 0) {
+            $payment_methods.eq(0).prop('checked', true);
+        }
+        var checkedId = $payment_methods.filter(':checked').eq(0).attr('id');
+        if (checkedId) {
+            $container.find('div.payment_box').hide();
+            $container.find('div.payment_box.' + checkedId).show();
+        }
+    }
+
+    /**
+     * Bind delegated payment method switch (once). Works for AJAX-injected checkout forms.
+     */
+    function ceecBindPaymentMethodSwitch() {
+        if ($(document.body).data('ceec-payment-method-bound')) {
+            return;
+        }
+        $(document.body).data('ceec-payment-method-bound', true);
+        $(document.body).on('click.ceec_payment_method', '.coderembassy-checkout-content input[name="payment_method"]', function (e) {
+            e.stopPropagation();
+            var $input = $(this);
+            var $container = $input.closest('.coderembassy-checkout-content');
+            var targetId = $input.attr('id');
+            var $targetBox = $container.find('div.payment_box.' + targetId);
+            if ($input.is(':checked') && $targetBox.length) {
+                $container.find('div.payment_box').filter(':visible').slideUp(230);
+                $targetBox.slideDown(230);
+            } else if ($container.find('.payment_methods input.input-radio').length <= 1) {
+                $container.find('div.payment_box').show();
+            }
+            if ($input.data('order_button_text')) {
+                $container.find('#place_order').text($input.data('order_button_text'));
+            } else {
+                var $placeOrder = $container.find('#place_order');
+                if ($placeOrder.data('value')) {
+                    $placeOrder.text($placeOrder.data('value'));
+                }
+            }
+            $(document.body).trigger('payment_method_selected');
+        });
+    }
+
     function loadCheckoutForm($checkoutContent) { // Clear existing content first
         $checkoutContent.empty();
 
         // Show loading message
         $checkoutContent.append('<div class="coderembassy-checkout-loading">Loading checkout form...</div>');
+
+        // Ensure delegated payment method handler is bound (once)
+        ceecBindPaymentMethodSwitch();
 
         // Make AJAX request to get checkout form
         $.ajax({
@@ -1482,6 +1536,9 @@
                             }
                         });
                     }
+
+                    // Payment method visibility: WC checkout.js bound to original form, so re-init for AJAX-injected form
+                    ceecInitPaymentMethods($checkoutContent);
 
                     // Trigger WooCommerce updated_checkout event to let Stripe mount its Elements
                     $(document.body).trigger('updated_checkout');
