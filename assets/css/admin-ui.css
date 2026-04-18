@@ -1,0 +1,389 @@
+/* ==========================================================
+   CoderEmbassy Express Checkout — Modern Admin UI
+   Loaded in addition to admin.css
+   ========================================================== */
+
+:root {
+    --ceec-bg:        #f0f0f1;
+    --ceec-surface:   #ffffff;
+    --ceec-border:    #e2e8f0;
+    --ceec-border2:   #cbd5e1;
+    --ceec-muted:     #f8fafc;
+    --ceec-text:      #0f172a;
+    --ceec-text2:     #475569;
+    --ceec-text3:     #94a3b8;
+    --ceec-accent:    var(--wp-admin-theme-color, #2563eb);
+    --ceec-accent-l:  rgba(37,99,235,.09);
+    --ceec-shadow-s:  0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.05);
+    --ceec-r:         10px;
+    --ceec-r-sm:      6px;
+}
+
+/* ----------------------------------------------------------
+   RESET / WRAP
+---------------------------------------------------------- */
+.ceec-admin-wrap { margin-right: 0; }
+
+/* ----------------------------------------------------------
+   PAGE HEADER
+---------------------------------------------------------- */
+.ceec-admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r);
+    padding: 18px 22px;
+    margin: 12px 0 18px;
+    box-shadow: var(--ceec-shadow-s);
+    gap: 12px;
+}
+
+.ceec-admin-header__left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.ceec-admin-header__icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg,#2563eb,#7c3aed);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ceec-admin-header__icon .dashicons {
+    color: #fff;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.ceec-admin-header h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ceec-text);
+    line-height: 1.2;
+}
+
+.ceec-admin-header p {
+    margin: 2px 0 0;
+    font-size: .79rem;
+    color: var(--ceec-text2);
+}
+
+.ceec-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.ceec-badge--pro {
+    background: linear-gradient(135deg,#f59e0b,#ef4444);
+    color: #fff;
+}
+
+/* ----------------------------------------------------------
+   SIDEBAR + LAYOUT
+---------------------------------------------------------- */
+.coderembassy-admin-container {
+    display: flex !important;
+    gap: 18px !important;
+    margin-top: 0 !important;
+    align-items: flex-start;
+}
+
+.coderembassy-admin-tabs {
+    flex: 0 0 200px !important;
+    background: #fff !important;
+    border: 1px solid var(--ceec-border) !important;
+    border-radius: var(--ceec-r) !important;
+    box-shadow: var(--ceec-shadow-s) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: sticky;
+    top: 32px;
+}
+
+.ceec-sidebar-header {
+    padding: 11px 14px 9px;
+    font-size: .67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--ceec-text3);
+    border-bottom: 1px solid var(--ceec-border);
+    background: var(--ceec-muted);
+}
+
+/* Override old tab nav */
+.coderembassy-admin-tabs .coderembassy-tab-nav {
+    padding: 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    border-bottom: none !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+}
+
+.coderembassy-admin-tabs .coderembassy-tab-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 9px 11px !important;
+    border-radius: var(--ceec-r-sm) !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    text-decoration: none;
+    color: var(--ceec-text2) !important;
+    font-size: .82rem !important;
+    font-weight: 500 !important;
+    transition: background .13s, color .13s;
+    background: transparent !important;
+    white-space: nowrap;
+}
+
+.coderembassy-admin-tabs .coderembassy-tab-link:hover {
+    background: var(--ceec-muted) !important;
+    color: var(--ceec-text) !important;
+}
+
+.coderembassy-admin-tabs .coderembassy-tab-link.active {
+    background: var(--ceec-accent-l) !important;
+    color: var(--ceec-accent) !important;
+    font-weight: 600 !important;
+    border-left: none !important;
+}
+
+.ceec-tab-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    opacity: .75;
+    flex-shrink: 0;
+}
+
+.coderembassy-admin-tabs .coderembassy-tab-link.active .ceec-tab-icon {
+    opacity: 1;
+}
+
+/* ----------------------------------------------------------
+   CONTENT CARD
+---------------------------------------------------------- */
+.coderembassy-admin-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    background: #fff !important;
+    border: 1px solid var(--ceec-border) !important;
+    border-radius: var(--ceec-r) !important;
+    box-shadow: var(--ceec-shadow-s) !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* ----------------------------------------------------------
+   SECTION HEADER
+---------------------------------------------------------- */
+.ceec-section-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--ceec-border);
+    background: var(--ceec-muted);
+}
+
+.ceec-section-header h2 {
+    margin: 0 0 3px !important;
+    padding: 0 !important;
+    font-size: .97rem !important;
+    font-weight: 700 !important;
+    color: var(--ceec-text) !important;
+    border-bottom: none !important;
+}
+
+.ceec-section-header p {
+    margin: 0 !important;
+    font-size: .8rem;
+    color: var(--ceec-text2);
+}
+
+/* ----------------------------------------------------------
+   SETTINGS GROUPS + ROWS
+---------------------------------------------------------- */
+.ceec-settings-group {
+    padding: 0 22px 6px;
+}
+
+.ceec-settings-group + .ceec-settings-group {
+    border-top: 1px solid var(--ceec-border);
+}
+
+.ceec-settings-group__header {
+    padding: 15px 0 9px;
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ceec-text3);
+}
+
+.ceec-settings-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--ceec-border);
+}
+
+.ceec-settings-row:last-of-type,
+.ceec-settings-row:last-child { border-bottom: none; }
+
+.ceec-settings-row__label {
+    flex: 0 0 210px;
+    padding-top: 2px;
+}
+
+.ceec-settings-row__label label {
+    display: block !important;
+    font-size: .84rem !important;
+    font-weight: 600 !important;
+    color: var(--ceec-text) !important;
+    margin-bottom: 3px !important;
+}
+
+.ceec-settings-row__desc {
+    font-size: .77rem;
+    color: var(--ceec-text2);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.ceec-settings-row__control { flex: 1; min-width: 0; }
+
+.ceec-settings-row__control input[type="text"],
+.ceec-settings-row__control input[type="number"],
+.ceec-settings-row__control select {
+    display: block !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    height: 36px !important;
+    padding: 0 10px !important;
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    font-size: .84rem !important;
+    color: var(--ceec-text) !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    transition: border-color .14s, box-shadow .14s;
+}
+
+.ceec-settings-row__control input[type="text"]:focus,
+.ceec-settings-row__control input[type="number"]:focus,
+.ceec-settings-row__control select:focus {
+    border-color: var(--ceec-accent) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.11) !important;
+    outline: none !important;
+}
+
+.ceec-settings-row__control input[type="color"] {
+    width: 42px !important;
+    height: 36px !important;
+    padding: 3px !important;
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    cursor: pointer;
+    background: none !important;
+}
+
+.ceec-settings-row__control p.description,
+.ceec-settings-row__control .description {
+    margin: 5px 0 0 !important;
+    font-size: .77rem !important;
+    color: var(--ceec-text2) !important;
+    line-height: 1.4;
+}
+
+/* Settings API table – still used in Global Settings tab */
+.coderembassy-admin-content .form-table {
+    margin: 0;
+    padding: 0 22px;
+}
+
+.coderembassy-admin-content .form-table th {
+    width: 210px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-left: 0;
+    font-size: .84rem;
+    font-weight: 600;
+    color: var(--ceec-text);
+}
+
+.coderembassy-admin-content .form-table td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-right: 0;
+}
+
+.coderembassy-admin-content .form-table tr {
+    border-bottom: 1px solid var(--ceec-border);
+}
+
+.coderembassy-admin-content .form-table tr:last-child { border-bottom: none; }
+
+.coderembassy-admin-content .form-table input[type="text"],
+.coderembassy-admin-content .form-table select {
+    height: 34px !important;
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    font-size: .84rem !important;
+    padding: 0 9px !important;
+    box-shadow: none !important;
+}
+
+/* Submit / footer */
+.coderembassy-admin-content .submit,
+.ceec-form-footer {
+    padding: 14px 22px !important;
+    background: var(--ceec-muted) !important;
+    border-top: 1px solid var(--ceec-border) !important;
+    margin: 0 !important;
+}
+
+.coderembassy-admin-content .button-primary,
+.ceec-form-footer .button-primary {
+    height: 34px !important;
+    padding: 0 16px !important;
+    border-radius: var(--ceec-r-sm) !important;
+    font-size: .84rem !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* ----------------------------------------------------------
+   RESPONSIVE
+---------------------------------------------------------- */
+@media (max-width: 860px) {
+    .coderembassy-admin-container { flex-direction: column !important; }
+    .coderembassy-admin-tabs { flex: none !important; position: static !important; width: 100% !important; }
+    .coderembassy-admin-tabs .coderembassy-tab-nav { flex-direction: row !important; overflow-x: auto; gap: 3px !important; }
+    .coderembassy-admin-tabs .coderembassy-tab-link { white-space: nowrap; border-bottom: none !important; }
+    .ceec-settings-row { flex-direction: column; gap: 7px; }
+    .ceec-settings-row__label { flex: none; }
+}

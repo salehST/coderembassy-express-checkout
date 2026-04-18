@@ -161,6 +161,9 @@
             // Initialize variation handlers
             initVariationHandlers($container);
 
+            // Per-product "Add to Cart" button for variable products in AJAX mode
+            initVariationAddToCartButtons($container);
+
             // Force enable all variation inputs multiple times to ensure they stay enabled
             function forceEnableVariations() {
                 $container.find('.coderembassy-variation-option input[type="radio"]').prop('disabled', false);
@@ -448,6 +451,12 @@
                 return;
             }
 
+            // Don't trigger if clicking anywhere inside the variation panel or ATC button
+            // (chips are <span> inside <label> — they don't match the guard above)
+            if ($(e.target).closest('.coderembassy-product-variations, .ceec-variation-atc-wrap').length > 0) {
+                return;
+            }
+
             // Don't trigger if clicking on title link
             if ($(e.target).is('a') || $(e.target).closest('a').length > 0) {
                 return;
@@ -543,6 +552,8 @@
 
 
     function initVariationHandlers($container) { // Initialize variation state for products with variations
+        var ajaxCart = $container.data('ajax-cart') == '1' || $container.data('ajax-cart') === 1;
+
         $container.find('.coderembassy-product-item.has-variations').each(function () {
             var $productItem = $(this);
             var $variationGroup = $productItem.find('.coderembassy-product-variations');
@@ -621,25 +632,42 @@
                     $productInput.data('variation-attributes', variationAttributes);
                 }
 
-                // Auto-select the product when all variations are chosen
-                $productInput.prop('checked', true);
-                $productItem.addClass('selected auto-selected');
-                $productItem.find('.coderembassy-product-quantity').addClass('active');
+                if (ajaxCart) {
+                    // AJAX mode: use the per-product "Add to Cart" button — do NOT auto-check or auto-add.
+                    // If the product was already in cart and the user changed variation, switch to "Update Cart".
+                    var $atcBtn = $productItem.find('.ceec-variation-atc-btn');
+                    if ($productItem.hasClass('ceec-in-cart')) {
+                        $atcBtn.prop('disabled', false)
+                               .text(ceecI18n('updateCart', 'Update Cart'))
+                               .addClass('ceec-atc-update')
+                               .removeClass('ceec-atc-remove');
+                    } else {
+                        $atcBtn.prop('disabled', false)
+                               .text(ceecI18n('addToCart', 'Add to Cart'))
+                               .removeClass('ceec-atc-update ceec-atc-remove');
+                    }
+                    updateAddToCartButton($container);
+                } else {
+                    // Non-AJAX / Quick Cart mode: auto-select as before
+                    $productInput.prop('checked', true);
+                    $productItem.addClass('selected auto-selected');
+                    $productItem.find('.coderembassy-product-quantity').addClass('active');
 
-                // Remove auto-selected class after animation
-                setTimeout(function () {
-                    $productItem.removeClass('auto-selected');
-                }, 600);
+                    // Remove auto-selected class after animation
+                    setTimeout(function () {
+                        $productItem.removeClass('auto-selected');
+                    }, 600);
 
-                // If quick cart is enabled, add to cart immediately
-                if (quickCart) {
-                    var productData = getProductData($productItem, productId);
-                    addToCartQuick($container, [productData], $productItem);
+                    // If quick cart is enabled, add to cart immediately
+                    if (quickCart) {
+                        var productData = getProductData($productItem, productId);
+                        addToCartQuick($container, [productData], $productItem);
+                    }
+                    // Note: When Quick Cart is disabled, products are only added when "Add Selected to Cart" button is clicked
+
+                    // Update add to cart button state
+                    updateAddToCartButton($container);
                 }
-                // Note: When Quick Cart is disabled, products are only added when "Add Selected to Cart" button is clicked
-
-                // Update add to cart button state
-                updateAddToCartButton($container);
 
             } else { // Disable product selection
                 $productInput.prop('disabled', true);
@@ -652,12 +680,135 @@
                 $productItem.removeClass('selected');
                 $productItem.find('.coderembassy-product-quantity').removeClass('active');
 
+                if (ajaxCart) {
+                    // Disable per-product button but preserve its current label (remove/update state)
+                    var $atcBtn = $productItem.find('.ceec-variation-atc-btn');
+                    if (! $productItem.hasClass('ceec-in-cart')) {
+                        $atcBtn.prop('disabled', true)
+                               .text(ceecI18n('addToCart', 'Add to Cart'))
+                               .removeClass('ceec-atc-update ceec-atc-remove');
+                    }
+                }
+
                 // Update add to cart button state
                 updateAddToCartButton($container);
             }
         });
 
         // Remove the problematic label click handler - let radio buttons work naturally
+    }
+
+    /**
+     * Small helper to pull translated strings from coderembassyData.i18n with a fallback.
+     */
+    function ceecI18n(key, fallback) {
+        return (typeof coderembassyData !== 'undefined' && coderembassyData.i18n && coderembassyData.i18n[key])
+            ? coderembassyData.i18n[key]
+            : fallback;
+    }
+
+    /**
+     * Per-product "Add to Cart" button for variable products in AJAX mode.
+     * Handles add, update (swap variation), and remove states.
+     */
+    function initVariationAddToCartButtons($container) {
+        $container.off('click.ceec-var-atc', '.ceec-variation-atc-btn');
+        $container.on('click.ceec-var-atc', '.ceec-variation-atc-btn', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $btn        = $(this);
+            var productId   = $btn.data('product-id');
+            var $productItem = $btn.closest('.coderembassy-product-item');
+
+            // ── REMOVE MODE ────────────────────────────────────────────────
+            if ($btn.hasClass('ceec-atc-remove')) {
+                $btn.prop('disabled', true).text(ceecI18n('removing', 'Removing…'));
+                removeFromCartAjax($container, productId, function () {
+                    $productItem.removeClass('ceec-in-cart selected');
+                    $productItem.find('.coderembassy-product-quantity').removeClass('active');
+                    $productItem.find('.coderembassy-product-checkbox-input, .coderembassy-product-radio-input').prop('checked', false);
+                    // Check if all variations still selected (user may want to re-add)
+                    var $variationGroup = $productItem.find('.coderembassy-product-variations');
+                    var allSelected     = checkAllVariationsSelected($variationGroup);
+                    $btn.removeClass('ceec-atc-remove ceec-atc-update')
+                        .text(ceecI18n('addToCart', 'Add to Cart'))
+                        .prop('disabled', !allSelected);
+                    updateAddToCartButton($container);
+                });
+                return;
+            }
+
+            // ── ADD / UPDATE MODE ──────────────────────────────────────────
+            var variationAttributes = {};
+            $productItem.find('.coderembassy-product-variations input[type="radio"]:checked').each(function () {
+                var attr = $(this).data('attribute');
+                if (attr) {
+                    variationAttributes[attr] = $(this).val();
+                }
+            });
+
+            var qty         = parseInt($productItem.find('.coderembassy-qty-input').val(), 10) || 1;
+            var productData = { product_id: productId, quantity: qty, variation: variationAttributes };
+            var isUpdate    = $btn.hasClass('ceec-atc-update') || $productItem.hasClass('ceec-in-cart');
+
+            $btn.prop('disabled', true).text(ceecI18n('adding', 'Adding…'));
+
+            var doAdd = function () {
+                $.ajax({
+                    url: coderembassyData.ajaxUrl,
+                    type: 'POST',
+                    data: {
+                        action: 'coderembassy_add_to_cart',
+                        products_data: [productData],
+                        nonce: coderembassyData.nonce
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Mark as in-cart
+                            $productItem.addClass('ceec-in-cart selected');
+                            $productItem.find('.coderembassy-product-quantity').addClass('active');
+                            $productItem.find('.coderembassy-product-checkbox-input, .coderembassy-product-radio-input').prop('checked', true);
+
+                            $btn.prop('disabled', false)
+                                .text(ceecI18n('removeFromCart', 'Remove from Cart'))
+                                .addClass('ceec-atc-remove')
+                                .removeClass('ceec-atc-update');
+
+                            showMessage($container, 'success', response.data.message);
+                            showCheckoutSection($container);
+                            updateAddToCartButton($container);
+
+                            // Refresh WooCommerce cart fragments
+                            if (typeof wc_cart_fragments_params !== 'undefined') {
+                                if (response.data.cart_fragments && response.data.cart_hash) {
+                                    $(document.body).trigger('added_to_cart', [response.data.cart_fragments, response.data.cart_hash, $btn]);
+                                } else {
+                                    $(document.body).trigger('wc_fragment_refresh');
+                                }
+                            }
+                        } else {
+                            $btn.prop('disabled', false).text(ceecI18n('addToCart', 'Add to Cart'));
+                            showMessage($container, 'error', (response.data && response.data.message) || ceecI18n('error', 'An error occurred.'));
+                        }
+                    },
+                    error: function () {
+                        $btn.prop('disabled', false).text(ceecI18n('addToCart', 'Add to Cart'));
+                        showMessage($container, 'error', ceecI18n('error', 'An error occurred.'));
+                    }
+                });
+            };
+
+            // If updating (replacing a variation already in cart), remove first then re-add
+            if (isUpdate) {
+                removeFromCartAjax($container, productId, function () {
+                    $productItem.removeClass('ceec-in-cart');
+                    doAdd();
+                });
+            } else {
+                doAdd();
+            }
+        });
     }
 
     function checkAllVariationsSelected($variationGroup) {
@@ -834,7 +985,7 @@
                 // Walk each product card and sync state
                 $container.find('.coderembassy-product-item').each(function () {
                     var $item = $(this);
-                    var $input = $item.find('input[data-product-id]');
+                    var $input = $item.find('input[data-product-id]').first();
                     var productId = String($input.data('product-id'));
 
                     if (cartItems.hasOwnProperty(productId)) {
@@ -847,6 +998,16 @@
 
                         // Set qty input to match cart
                         $item.find('.coderembassy-qty-input').val(qty);
+
+                        // For variable products with the per-product ATC button, set to "Remove" state
+                        var $atcBtn = $item.find('.ceec-variation-atc-btn');
+                        if ($atcBtn.length) {
+                            $item.addClass('ceec-in-cart');
+                            $atcBtn.prop('disabled', false)
+                                   .text(ceecI18n('removeFromCart', 'Remove from Cart'))
+                                   .addClass('ceec-atc-remove')
+                                   .removeClass('ceec-atc-update');
+                        }
                     }
                 });
 
@@ -903,6 +1064,12 @@
             var $input = $(this);
             var productId = $input.data('product-id');
             var $productItem = $input.closest('.coderembassy-product-item');
+
+            // Skip variable products that use the per-product ATC button in AJAX mode —
+            // they are already managed independently and must not be double-added.
+            if ($productItem.hasClass('ceec-in-cart')) {
+                return; // continue $.each
+            }
 
             if (productId) {
                 var productData = getProductData($productItem, productId);

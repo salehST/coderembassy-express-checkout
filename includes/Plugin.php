@@ -569,11 +569,11 @@ body.ceec-express-page .coderembassy-express-checkout .coderembassy-product-item
     width: auto !important;
     min-height: 0 !important;
     position: relative !important;
-    border: 2px solid #e1e5e9 !important;
+    border: 1px solid #e2e8f0 !important;
     border-radius: 12px !important;
     padding: 15px !important;
     background: #fff !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07) !important;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.05), 0 4px 16px rgba(15,23,42,0.06) !important;
     overflow: visible !important;
 }
 .coderembassy-express-checkout .coderembassy-product-body,
@@ -727,6 +727,14 @@ body.ceec-express-page .coderembassy-express-checkout .coderembassy-product-foot
             'coderembassy-express-checkout-admin',
             CODEREMBASSY_EXPRESS_CHECKOUT_PLUGIN_URL . 'assets/css/admin.css',
             array('wp-color-picker'),
+            $this->version
+        );
+
+        // Modern admin UI overrides (separate file so it survives independently)
+        wp_enqueue_style(
+            'coderembassy-express-checkout-admin-ui',
+            CODEREMBASSY_EXPRESS_CHECKOUT_PLUGIN_URL . 'assets/css/admin-ui.css',
+            array('coderembassy-express-checkout-admin'),
             $this->version
         );
 
