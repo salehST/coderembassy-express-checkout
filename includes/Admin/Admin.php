@@ -19,6 +19,10 @@ class Admin
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'init_settings'));
+
+        // Premium Banner for list page
+        add_action('admin_notices', array($this, 'add_list_page_banner'), 1);
+        add_filter('admin_body_class', array($this, 'add_admin_body_class'));
     }
 
     /**
@@ -197,147 +201,178 @@ class Admin
      */
     public function configuration_page()
     {
-    ?>
-        <div class="wrap">
-            <h1><?php esc_html_e('CoderEmbassy Express Checkout Configuration', 'coderembassy-express-checkout'); ?></h1>
-
-            <div class="coderembassy-admin-container">
-                <div class="coderembassy-admin-tabs">
-                    <nav class="coderembassy-tab-nav">
-                        <a href="#coderembassy-settings-tab" class="coderembassy-tab-link active" data-tab="settings">
-                            <?php esc_html_e('Global Settings', 'coderembassy-express-checkout'); ?>
-                        </a>
-                        <a href="#coderembassy-design-tab" class="coderembassy-tab-link" data-tab="design">
-                            <?php esc_html_e('Global Design', 'coderembassy-express-checkout'); ?>
-                        </a>
-                    </nav>
-                </div>
-
-                <div class="coderembassy-admin-content">
-                    <div id="coderembassy-settings-tab" class="coderembassy-tab-content active">
-                        <form method="post" action="options.php">
-                            <?php
-                            settings_fields('coderembassy_configuration');
-                            do_settings_sections('coderembassy_configuration');
-                            submit_button();
-                            ?>
-                        </form>
+        ?>
+        <div class="wrap ceec-pro-admin-wrap ceec-pro-config-wrap">
+            <!-- Premium Header -->
+            <div class="ceec-pro-page-header">
+                <div class="ceec-pro-page-header__left">
+                    <div class="ceec-pro-page-header__icon">
+                        <span class="dashicons dashicons-admin-generic"></span>
                     </div>
-
-                    <div id="coderembassy-design-tab" class="coderembassy-tab-content">
-                        <h2><?php esc_html_e('Global Design Settings', 'coderembassy-express-checkout'); ?></h2>
-                        <p><?php esc_html_e('These settings will be used as defaults for all shortcodes. Individual shortcodes can override these settings.', 'coderembassy-express-checkout'); ?></p>
-
-                        <form method="post" action="options.php">
-                            <?php
-                            settings_fields('coderembassy_design_configuration');
-                            ?>
-                            <table class="form-table">
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_width"><?php esc_html_e('Default Product Width', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="coderembassy_default_width" name="coderembassy_global_design_options[default_width]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_width'] ?? '200px'); ?>" class="regular-text" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_height"><?php esc_html_e('Default Product Height', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="coderembassy_default_height" name="coderembassy_global_design_options[default_height]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_height'] ?? '300px'); ?>" class="regular-text" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_font_size"><?php esc_html_e('Default Title Font Size', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="coderembassy_default_font_size" name="coderembassy_global_design_options[default_font_size]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_font_size'] ?? '16px'); ?>" class="regular-text" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_color"><?php esc_html_e('Default Title Color', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="color" id="coderembassy_default_color" name="coderembassy_global_design_options[default_color]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_color'] ?? '#333333'); ?>" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_grid_columns"><?php esc_html_e('Default Grid Columns', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <select id="coderembassy_default_grid_columns" name="coderembassy_global_design_options[default_grid_columns]">
-                                            <option value="auto-fill" <?php selected(get_option('coderembassy_global_design_options')['default_grid_columns'] ?? 'auto-fill', 'auto-fill'); ?>><?php esc_html_e('Auto Fill (Responsive)', 'coderembassy-express-checkout'); ?></option>
-                                            <option value="1" <?php selected(get_option('coderembassy_global_design_options')['default_grid_columns'] ?? 'auto-fill', '1'); ?>><?php esc_html_e('1 Column', 'coderembassy-express-checkout'); ?></option>
-                                            <option value="2" <?php selected(get_option('coderembassy_global_design_options')['default_grid_columns'] ?? 'auto-fill', '2'); ?>><?php esc_html_e('2 Columns', 'coderembassy-express-checkout'); ?></option>
-                                            <option value="3" <?php selected(get_option('coderembassy_global_design_options')['default_grid_columns'] ?? 'auto-fill', '3'); ?>><?php esc_html_e('3 Columns', 'coderembassy-express-checkout'); ?></option>
-                                            <option value="4" <?php selected(get_option('coderembassy_global_design_options')['default_grid_columns'] ?? 'auto-fill', '4'); ?>><?php esc_html_e('4 Columns', 'coderembassy-express-checkout'); ?></option>
-                                            <option value="5" <?php selected(get_option('coderembassy_global_design_options')['default_grid_columns'] ?? 'auto-fill', '5'); ?>><?php esc_html_e('5 Columns', 'coderembassy-express-checkout'); ?></option>
-                                        </select>
-                                        <p class="description"><?php esc_html_e('Default number of columns for product grid layout.', 'coderembassy-express-checkout'); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_grid_gap"><?php esc_html_e('Default Grid Gap', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="coderembassy_default_grid_gap" name="coderembassy_global_design_options[default_grid_gap]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_grid_gap'] ?? '20px'); ?>" class="regular-text" placeholder="20px" />
-                                        <p class="description"><?php esc_html_e('Default space between products (e.g., 20px, 1rem, 2em).', 'coderembassy-express-checkout'); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_container_border_color"><?php esc_html_e('Default Container Border Color', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="color" id="coderembassy_default_container_border_color" name="coderembassy_global_design_options[default_container_border_color]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_container_border_color'] ?? '#e1e5e9'); ?>" />
-                                        <p class="description"><?php esc_html_e('Default border color for the main container.', 'coderembassy-express-checkout'); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_container_background_color"><?php esc_html_e('Default Container Background Color', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="color" id="coderembassy_default_container_background_color" name="coderembassy_global_design_options[default_container_background_color]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_container_background_color'] ?? '#f8f9fa'); ?>" />
-                                        <p class="description"><?php esc_html_e('Default background color for the main container.', 'coderembassy-express-checkout'); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_container_padding"><?php esc_html_e('Default Container Padding', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="coderembassy_default_container_padding" name="coderembassy_global_design_options[default_container_padding]" value="<?php echo esc_attr(get_option('coderembassy_global_design_options')['default_container_padding'] ?? '20px'); ?>" class="regular-text" placeholder="20px" />
-                                        <p class="description"><?php esc_html_e('Default padding for the main container (e.g., 20px, 1rem, 2em).', 'coderembassy-express-checkout'); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="coderembassy_default_show_checkout_section"><?php esc_html_e('Default Show Checkout Section', 'coderembassy-express-checkout'); ?></label>
-                                    </th>
-                                    <td>
-                                        <select id="coderembassy_default_show_checkout_section" name="coderembassy_global_design_options[default_show_checkout_section]">
-                                            <option value="yes" <?php selected(get_option('coderembassy_global_design_options')['default_show_checkout_section'] ?? 'yes', 'yes'); ?>><?php esc_html_e('Yes', 'coderembassy-express-checkout'); ?></option>
-                                            <option value="no" <?php selected(get_option('coderembassy_global_design_options')['default_show_checkout_section'] ?? 'yes', 'no'); ?>><?php esc_html_e('No', 'coderembassy-express-checkout'); ?></option>
-                                        </select>
-                                        <p class="description"><?php esc_html_e('Default setting for showing the WooCommerce checkout form after the express checkout to allow users to complete their purchase on the same page.', 'coderembassy-express-checkout'); ?></p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <?php submit_button(); ?>
-                        </form>
+                    <div class="ceec-pro-page-header__text">
+                        <h1><?php esc_html_e( 'Configuration', 'coderembassy-express-checkout' ); ?></h1>
+                        <p><?php esc_html_e( 'Configure global defaults and display settings for your express checkout.', 'coderembassy-express-checkout' ); ?></p>
                     </div>
                 </div>
             </div>
+
+            <form method="post" action="options.php" class="ceec-hero-form">
+                <?php
+                settings_fields('coderembassy_configuration');
+                settings_fields('coderembassy_design_configuration');
+                ?>
+
+                <div class="ceec-pro-settings-layout">
+                    <!-- Main Column -->
+                    <div class="ceec-pro-settings-main">
+                        
+                        <!-- Card: Global Settings -->
+                        <div class="ceec-pro-card">
+                            <div class="ceec-pro-card__header ceec-pro-card__header--accent">
+                                <div class="ceec-pro-card__header-icon">
+                                    <span class="dashicons dashicons-admin-settings"></span>
+                                </div>
+                                <div>
+                                    <h2><?php esc_html_e( 'Global Settings', 'coderembassy-express-checkout' ); ?></h2>
+                                    <p><?php esc_html_e( 'Core behavior settings for all shortcodes.', 'coderembassy-express-checkout' ); ?></p>
+                                </div>
+                            </div>
+                            <div class="ceec-pro-card__body">
+                                <div class="ceec-settings-rows">
+                                    <?php do_settings_sections('coderembassy_configuration'); ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card: Global Design -->
+                        <div class="ceec-pro-card">
+                            <div class="ceec-pro-card__header">
+                                <div class="ceec-pro-card__header-icon">
+                                    <span class="dashicons dashicons-admin-appearance"></span>
+                                </div>
+                                <div>
+                                    <h2><?php esc_html_e( 'Global Design Settings', 'coderembassy-express-checkout' ); ?></h2>
+                                    <p><?php esc_html_e( 'Visual and layout defaults for all products.', 'coderembassy-express-checkout' ); ?></p>
+                                </div>
+                            </div>
+                            <div class="ceec-pro-card__body">
+                                <div class="ceec-settings-rows">
+                                    <?php do_settings_sections('coderembassy_design_configuration'); ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Save Bar (Premium Style) -->
+                        <div class="ceec-pro-card ceec-save-card">
+                            <div class="ceec-pro-card__body">
+                                <?php submit_button( __( 'Save All Settings', 'coderembassy-express-checkout' ), 'primary', 'submit', false ); ?>
+                                <p class="ceec-save-hint"><?php esc_html_e( 'Settings will be applied to all shortcodes immediately.', 'coderembassy-express-checkout' ); ?></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Column -->
+                    <div class="ceec-pro-settings-sidebar">
+                        <div class="ceec-pro-card">
+                            <div class="ceec-pro-card__header">
+                                <h2><?php esc_html_e( 'Quick Links', 'coderembassy-express-checkout' ); ?></h2>
+                            </div>
+                            <div class="ceec-pro-card__body ceec-quick-links">
+                                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=coderembassy_ec' ) ); ?>" class="ceec-quick-link">
+                                    <span class="dashicons dashicons-list-view"></span> <?php esc_html_e( 'Manage Shortcodes', 'coderembassy-express-checkout' ); ?>
+                                </a>
+                                <a href="https://coderembassy.com/docs" target="_blank" class="ceec-quick-link">
+                                    <span class="dashicons dashicons-editor-help"></span> <?php esc_html_e( 'Documentation', 'coderembassy-express-checkout' ); ?>
+                                </a>
+                                <a href="https://coderembassy.com/support" target="_blank" class="ceec-quick-link">
+                                    <span class="dashicons dashicons-format-chat"></span> <?php esc_html_e( 'Get Support', 'coderembassy-express-checkout' ); ?>
+                                </a>
+                            </div>
+                        </div>
+
+                        <?php if ( ! defined('CODEREMBASSY_EXPRESS_CHECKOUT_PRO_VERSION') ) : ?>
+                        <div class="ceec-pro-card ceec-upgrade-card">
+                            <div class="ceec-pro-card__body">
+                                <div class="ceec-upgrade-icon"><span class="dashicons dashicons-star-filled"></span></div>
+                                <h3><?php esc_html_e( 'Upgrade to Pro', 'coderembassy-express-checkout' ); ?></h3>
+                                <p><?php esc_html_e( 'Get premium templates, variation styles, custom image sizes, and priority support.', 'coderembassy-express-checkout' ); ?></p>
+                                <a href="https://coderembassy.com/pro" target="_blank" class="ceec-upgrade-btn">
+                                    <?php esc_html_e( 'Go Pro Now', 'coderembassy-express-checkout' ); ?>
+                                </a>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </form>
         </div>
-<?php
+        <?php
     }
+
+    /**
+     * Add admin body class
+     * @since 1.0.0
+     */
+    public function add_admin_body_class($classes) {
+        $screen = get_current_screen();
+        if ( isset($screen->id) && in_array($screen->id, array('edit-coderembassy_ec', 'coderembassy_ec')) ) {
+            $classes .= ' ceec-pro-list-page ';
+        }
+        return $classes;
+    }
+
+    /**
+     * Add list page banner
+     * @since 1.0.0
+     */
+    public function add_list_page_banner() {
+        $screen = get_current_screen();
+        if ( !isset($screen->id) || !in_array($screen->id, array('edit-coderembassy_ec', 'coderembassy_ec')) ) {
+            return;
+        }
+
+        $is_pro = defined('CODEREMBASSY_EXPRESS_CHECKOUT_PRO_VERSION');
+
+        $is_edit_screen = ($screen->id === 'coderembassy_ec');
+        $is_add_new     = $is_edit_screen && (!isset($_GET['post']) || empty($_GET['post']));
+        
+        $title = $is_edit_screen ? ( $is_add_new ? __('Add New Shortcode', 'coderembassy-express-checkout') : __('Edit Shortcode', 'coderembassy-express-checkout') ) : __('Express Checkout Shortcodes', 'coderembassy-express-checkout');
+        $desc  = $is_edit_screen ? __('Configure your express checkout settings below.', 'coderembassy-express-checkout') : __('Manage your express checkout instances and copy shortcodes to your pages.', 'coderembassy-express-checkout');
+        $icon  = $is_edit_screen ? 'dashicons-edit' : 'dashicons-list-view';
+
+        ?>
+        <div class="ceec-pro-list-header-wrap">
+            <div class="ceec-pro-page-header">
+                <div class="ceec-pro-page-header__left">
+                    <div class="ceec-pro-page-header__icon">
+                        <span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
+                    </div>
+                    <div class="ceec-pro-page-header__text">
+                        <h1><?php echo esc_html( $title ); ?></h1>
+                        <p><?php echo esc_html( $desc ); ?></p>
+                    </div>
+                </div>
+                
+                <div class="ceec-pro-page-header__right">
+                    <div class="ceec-pro-page-header__badges">
+                        <?php if ($is_pro) : ?>
+                            <span class="ceec-version-tag ceec-version-tag--pro">PRO</span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if ( !$is_add_new ) : ?>
+                    <div class="ceec-pro-header-actions">
+                        <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=coderembassy_ec' ) ); ?>" class="ceec-save-btn">
+                            <span class="dashicons dashicons-plus"></span> <?php esc_html_e( 'Add New Shortcode', 'coderembassy-express-checkout' ); ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
 
 
     public function sanitize_global_options($input)

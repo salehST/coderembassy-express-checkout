@@ -178,13 +178,15 @@ class Shortcode
         $pro_thumb_width     = '';
         $pro_thumb_height    = '';
         if ( $post_id && defined( 'CODEREMBASSY_EXPRESS_CHECKOUT_PRO_VERSION' ) ) {
-            $pro_product_layout  = get_post_meta( $post_id, '_ceec_pro_product_layout',  true ) ?: 'grid';
-            $pro_show_thumbnail  = get_post_meta( $post_id, '_ceec_pro_show_thumbnail',  true ) ?: 'yes';
-            $pro_show_qty        = get_post_meta( $post_id, '_ceec_pro_show_qty',        true ) ?: 'yes';
-            $pro_variation_style = get_post_meta( $post_id, '_ceec_pro_variation_style', true ) ?: 'radio';
-            $pro_list_columns    = get_post_meta( $post_id, '_ceec_pro_list_columns',    true ) ?: '1';
-            $pro_thumb_width     = get_post_meta( $post_id, '_ceec_pro_thumb_width',     true );
-            $pro_thumb_height    = get_post_meta( $post_id, '_ceec_pro_thumb_height',    true );
+            $pro_options = get_option( 'coderembassy_pro_options', array() );
+            
+            $pro_product_layout  = get_post_meta( $post_id, '_ceec_pro_product_layout',  true ) ?: ( $pro_options['product_layout'] ?? 'grid' );
+            $pro_show_thumbnail  = get_post_meta( $post_id, '_ceec_pro_show_thumbnail',  true ) ?: ( $pro_options['show_thumbnail'] ?? 'yes' );
+            $pro_show_qty        = get_post_meta( $post_id, '_ceec_pro_show_qty',        true ) ?: ( $pro_options['show_qty'] ?? 'yes' );
+            $pro_variation_style = get_post_meta( $post_id, '_ceec_pro_variation_style', true ) ?: ( $pro_options['variation_style'] ?? 'radio' );
+            $pro_list_columns    = get_post_meta( $post_id, '_ceec_pro_list_columns',    true ) ?: ( $pro_options['list_columns'] ?? '1' );
+            $pro_thumb_width     = get_post_meta( $post_id, '_ceec_pro_thumb_width',     true ) ?: ( $pro_options['thumb_width'] ?? '' );
+            $pro_thumb_height    = get_post_meta( $post_id, '_ceec_pro_thumb_height',    true ) ?: ( $pro_options['thumb_height'] ?? '' );
         }
         // Build extra CSS classes for the outer container
         $pro_extra_classes  = ' ceec-layout-' . sanitize_html_class( $pro_product_layout );

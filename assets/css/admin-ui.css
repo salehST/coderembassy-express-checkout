@@ -1,5 +1,5 @@
 /* ==========================================================
-   CoderEmbassy Express Checkout — Modern Admin UI
+   CoderEmbassy Express Checkout Pro — Modern Admin UI
    Loaded in addition to admin.css
    ========================================================== */
 
@@ -17,16 +17,14 @@
     --ceec-shadow-s:  0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.05);
     --ceec-r:         10px;
     --ceec-r-sm:      6px;
+    --ceec-danger:    #dc2626;
 }
 
 /* ----------------------------------------------------------
-   RESET / WRAP
+   PAGE HEADER (shared with free plugin style)
 ---------------------------------------------------------- */
-.ceec-admin-wrap { margin-right: 0; }
+.ceec-pro-wrap { margin-right: 0; }
 
-/* ----------------------------------------------------------
-   PAGE HEADER
----------------------------------------------------------- */
 .ceec-admin-header {
     display: flex;
     align-items: center;
@@ -98,143 +96,44 @@
 }
 
 /* ----------------------------------------------------------
-   SIDEBAR + LAYOUT
+   PRO SETTINGS LAYOUT
 ---------------------------------------------------------- */
-.coderembassy-admin-container {
-    display: flex !important;
-    gap: 18px !important;
-    margin-top: 0 !important;
+.ceec-pro-layout {
+    display: flex;
+    gap: 18px;
     align-items: flex-start;
 }
 
-.coderembassy-admin-tabs {
-    flex: 0 0 200px !important;
-    background: #fff !important;
-    border: 1px solid var(--ceec-border) !important;
-    border-radius: var(--ceec-r) !important;
-    box-shadow: var(--ceec-shadow-s) !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    position: sticky;
-    top: 32px;
-}
-
-.ceec-sidebar-header {
-    padding: 11px 14px 9px;
-    font-size: .67rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-    color: var(--ceec-text3);
-    border-bottom: 1px solid var(--ceec-border);
-    background: var(--ceec-muted);
-}
-
-/* Override old tab nav */
-.coderembassy-admin-tabs .coderembassy-tab-nav {
-    padding: 5px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    border-bottom: none !important;
-    margin: 0 !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-}
-
-.coderembassy-admin-tabs .coderembassy-tab-link {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 9px 11px !important;
-    border-radius: var(--ceec-r-sm) !important;
-    border-bottom: none !important;
-    border-left: none !important;
-    border-right: none !important;
-    text-decoration: none;
-    color: var(--ceec-text2) !important;
-    font-size: .82rem !important;
-    font-weight: 500 !important;
-    transition: background .13s, color .13s;
-    background: transparent !important;
-    white-space: nowrap;
-}
-
-.coderembassy-admin-tabs .coderembassy-tab-link:hover {
-    background: var(--ceec-muted) !important;
-    color: var(--ceec-text) !important;
-}
-
-.coderembassy-admin-tabs .coderembassy-tab-link.active {
-    background: var(--ceec-accent-l) !important;
-    color: var(--ceec-accent) !important;
-    font-weight: 600 !important;
-    border-left: none !important;
-}
-
-.ceec-tab-icon {
-    font-size: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
-    opacity: .75;
-    flex-shrink: 0;
-}
-
-.coderembassy-admin-tabs .coderembassy-tab-link.active .ceec-tab-icon {
-    opacity: 1;
-}
-
-/* ----------------------------------------------------------
-   CONTENT CARD
----------------------------------------------------------- */
-.coderembassy-admin-content {
-    flex: 1 !important;
-    min-width: 0 !important;
-    background: #fff !important;
-    border: 1px solid var(--ceec-border) !important;
-    border-radius: var(--ceec-r) !important;
-    box-shadow: var(--ceec-shadow-s) !important;
-    padding: 0 !important;
+.ceec-pro-main {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r);
+    box-shadow: var(--ceec-shadow-s);
     overflow: hidden;
 }
 
+.ceec-pro-sidebar {
+    flex: 0 0 250px;
+}
+
 /* ----------------------------------------------------------
-   SECTION HEADER
+   INFO CARDS (sidebar)
 ---------------------------------------------------------- */
-.ceec-section-header {
-    padding: 18px 22px 14px;
-    border-bottom: 1px solid var(--ceec-border);
+.ceec-info-card {
+    background: #fff;
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r);
+    overflow: hidden;
+    box-shadow: var(--ceec-shadow-s);
+    margin-bottom: 14px;
+}
+
+.ceec-info-card__header {
     background: var(--ceec-muted);
-}
-
-.ceec-section-header h2 {
-    margin: 0 0 3px !important;
-    padding: 0 !important;
-    font-size: .97rem !important;
-    font-weight: 700 !important;
-    color: var(--ceec-text) !important;
-    border-bottom: none !important;
-}
-
-.ceec-section-header p {
-    margin: 0 !important;
-    font-size: .8rem;
-    color: var(--ceec-text2);
-}
-
-/* ----------------------------------------------------------
-   SETTINGS GROUPS + ROWS
----------------------------------------------------------- */
-.ceec-settings-group {
-    padding: 0 22px 6px;
-}
-
-.ceec-settings-group + .ceec-settings-group {
-    border-top: 1px solid var(--ceec-border);
-}
-
-.ceec-settings-group__header {
-    padding: 15px 0 9px;
+    border-bottom: 1px solid var(--ceec-border);
+    padding: 10px 15px;
     font-size: .7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -242,19 +141,118 @@
     color: var(--ceec-text3);
 }
 
+.ceec-info-card__body {
+    padding: 13px 15px;
+    font-size: .81rem;
+    color: var(--ceec-text2);
+    line-height: 1.55;
+}
+
+.ceec-info-card__body ul {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ceec-info-card__body ul li {
+    padding: 3px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.ceec-info-card__body ul li::before {
+    content: '→';
+    color: var(--ceec-accent);
+    flex-shrink: 0;
+    font-size: .73rem;
+    margin-top: 2px;
+}
+
+/* ----------------------------------------------------------
+   TEMPLATE CHIPS
+---------------------------------------------------------- */
+.ceec-template-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 15px;
+}
+
+.ceec-template-chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 11px;
+    background: var(--ceec-muted);
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r-sm);
+    font-size: .8rem;
+}
+
+.ceec-template-chip__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ceec-template-chip__name {
+    flex: 1;
+    font-weight: 600;
+    color: var(--ceec-text);
+}
+
+.ceec-template-chip__badge {
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--ceec-accent-l);
+    color: var(--ceec-accent);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+/* ----------------------------------------------------------
+   SECTION HEADER
+---------------------------------------------------------- */
+.ceec-section-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--ceec-border);
+    background: var(--ceec-muted);
+}
+
+.ceec-section-header h2 {
+    margin: 0 0 2px !important;
+    padding: 0 !important;
+    font-size: .95rem !important;
+    font-weight: 700 !important;
+    color: var(--ceec-text) !important;
+    border-bottom: none !important;
+}
+
+.ceec-section-header p {
+    margin: 0 !important;
+    font-size: .79rem;
+    color: var(--ceec-text2);
+}
+
+/* ----------------------------------------------------------
+   SETTINGS ROWS (main form)
+---------------------------------------------------------- */
 .ceec-settings-row {
     display: flex;
     align-items: flex-start;
-    gap: 22px;
-    padding: 13px 0;
+    gap: 20px;
+    padding: 13px 20px;
     border-bottom: 1px solid var(--ceec-border);
 }
 
-.ceec-settings-row:last-of-type,
-.ceec-settings-row:last-child { border-bottom: none; }
+.ceec-settings-row:last-of-type { border-bottom: none; }
 
 .ceec-settings-row__label {
-    flex: 0 0 210px;
+    flex: 0 0 200px;
     padding-top: 2px;
 }
 
@@ -267,47 +265,35 @@
 }
 
 .ceec-settings-row__desc {
-    font-size: .77rem;
+    font-size: .76rem;
     color: var(--ceec-text2);
     margin: 0;
     line-height: 1.4;
 }
 
-.ceec-settings-row__control { flex: 1; min-width: 0; }
+.ceec-settings-row__control { flex: 1; }
 
-.ceec-settings-row__control input[type="text"],
-.ceec-settings-row__control input[type="number"],
-.ceec-settings-row__control select {
+.ceec-settings-row__control select,
+.ceec-settings-row__control input[type="text"] {
     display: block !important;
     width: 100% !important;
-    max-width: 300px !important;
-    height: 36px !important;
-    padding: 0 10px !important;
+    max-width: 280px !important;
+    height: 34px !important;
+    padding: 0 9px !important;
     border: 1.5px solid var(--ceec-border2) !important;
     border-radius: var(--ceec-r-sm) !important;
-    font-size: .84rem !important;
+    font-size: .83rem !important;
     color: var(--ceec-text) !important;
     background: #fff !important;
     box-shadow: none !important;
     transition: border-color .14s, box-shadow .14s;
 }
 
-.ceec-settings-row__control input[type="text"]:focus,
-.ceec-settings-row__control input[type="number"]:focus,
-.ceec-settings-row__control select:focus {
+.ceec-settings-row__control select:focus,
+.ceec-settings-row__control input[type="text"]:focus {
     border-color: var(--ceec-accent) !important;
     box-shadow: 0 0 0 3px rgba(37,99,235,.11) !important;
     outline: none !important;
-}
-
-.ceec-settings-row__control input[type="color"] {
-    width: 42px !important;
-    height: 36px !important;
-    padding: 3px !important;
-    border: 1.5px solid var(--ceec-border2) !important;
-    border-radius: var(--ceec-r-sm) !important;
-    cursor: pointer;
-    background: none !important;
 }
 
 .ceec-settings-row__control p.description,
@@ -318,72 +304,1373 @@
     line-height: 1.4;
 }
 
-/* Settings API table – still used in Global Settings tab */
-.coderembassy-admin-content .form-table {
-    margin: 0;
-    padding: 0 22px;
-}
-
-.coderembassy-admin-content .form-table th {
-    width: 210px;
-    padding-top: 13px;
-    padding-bottom: 13px;
-    padding-left: 0;
-    font-size: .84rem;
-    font-weight: 600;
-    color: var(--ceec-text);
-}
-
-.coderembassy-admin-content .form-table td {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    padding-right: 0;
-}
-
-.coderembassy-admin-content .form-table tr {
-    border-bottom: 1px solid var(--ceec-border);
-}
-
-.coderembassy-admin-content .form-table tr:last-child { border-bottom: none; }
-
-.coderembassy-admin-content .form-table input[type="text"],
-.coderembassy-admin-content .form-table select {
-    height: 34px !important;
-    border: 1.5px solid var(--ceec-border2) !important;
-    border-radius: var(--ceec-r-sm) !important;
-    font-size: .84rem !important;
-    padding: 0 9px !important;
-    box-shadow: none !important;
-}
-
-/* Submit / footer */
-.coderembassy-admin-content .submit,
 .ceec-form-footer {
-    padding: 14px 22px !important;
+    padding: 13px 20px !important;
     background: var(--ceec-muted) !important;
     border-top: 1px solid var(--ceec-border) !important;
-    margin: 0 !important;
 }
 
-.coderembassy-admin-content .button-primary,
 .ceec-form-footer .button-primary {
     height: 34px !important;
     padding: 0 16px !important;
     border-radius: var(--ceec-r-sm) !important;
-    font-size: .84rem !important;
+    font-size: .83rem !important;
     font-weight: 600 !important;
     box-shadow: none !important;
     text-shadow: none !important;
 }
 
 /* ----------------------------------------------------------
+   META BOX FIELD SETTINGS
+---------------------------------------------------------- */
+.coderembassy-pro-field-settings { padding: 2px 0; }
+
+.ceec-meta-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .77rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--ceec-text3);
+    margin: 14px 0 9px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ceec-border);
+}
+
+.ceec-meta-section-title:first-child { margin-top: 0; }
+
+.ceec-meta-section-title .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.ceec-meta-desc {
+    font-size: .79rem;
+    color: var(--ceec-text2);
+    line-height: 1.5;
+    margin: 0 0 10px;
+}
+
+.ceec-drag-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .77rem;
+    color: var(--ceec-text3);
+    margin-bottom: 9px;
+}
+
+.ceec-drag-hint .dashicons {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+}
+
+/* ── Field hint strip ── */
+.ceec-field-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .75rem;
+    color: var(--ceec-text2);
+    background: var(--ceec-muted);
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r-sm);
+    padding: 5px 11px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.ceec-field-hint .dashicons {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+    color: var(--ceec-accent);
+    flex-shrink: 0;
+}
+
+/* ── Field grid ── */
+.coderembassy-field-list {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    margin: 0 0 6px !important;
+}
+
+/* ── Field card (base state = visible / active) ── */
+.coderembassy-field-list label.coderembassy-field-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 9px 11px !important;
+    background: #fff !important;
+    border: 1.5px solid var(--ceec-border) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    cursor: grab !important;
+    font-size: .81rem !important;
+    color: var(--ceec-text) !important;
+    transition: border-color .15s, background .15s, box-shadow .15s, opacity .15s, transform .15s;
+    user-select: none;
+    min-height: 40px;
+    position: relative;
+}
+
+.coderembassy-field-list label.coderembassy-field-item:hover {
+    border-color: var(--ceec-border2) !important;
+    background: #f8fafc !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07) !important;
+}
+
+.coderembassy-field-list label.coderembassy-field-item:active {
+    cursor: grabbing !important;
+}
+
+/* ── Dragging state ── */
+.coderembassy-field-list label.coderembassy-field-item.ui-sortable-helper,
+.coderembassy-field-list label.coderembassy-field-item.ceec-field--dragging {
+    background: #fff !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.15), 0 2px 8px rgba(0,0,0,.08) !important;
+    border-color: var(--ceec-accent) !important;
+    z-index: 9999 !important;
+    cursor: grabbing !important;
+    transform: rotate(1.5deg) scale(1.02);
+}
+
+/* ── Drop placeholder ── */
+.coderembassy-field-placeholder {
+    background: rgba(37,99,235,.05) !important;
+    border: 2px dashed rgba(37,99,235,.30) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    box-sizing: border-box;
+    margin-bottom: 0 !important;
+}
+
+/* ── HIDDEN state (field will be removed from form) ── */
+.coderembassy-field-list label.coderembassy-field-item.ceec-field--hidden {
+    background: #fff7f7 !important;
+    border-color: #fca5a5 !important;
+    opacity: .8;
+}
+
+.coderembassy-field-list label.coderembassy-field-item.ceec-field--hidden:hover {
+    background: #fef2f2 !important;
+    border-color: #f87171 !important;
+    opacity: 1;
+}
+
+.coderembassy-field-list label.coderembassy-field-item.ceec-field--hidden .ceec-field-name {
+    text-decoration: line-through !important;
+    color: #9ca3af !important;
+}
+
+.coderembassy-field-list label.coderembassy-field-item.ceec-field--hidden .ceec-field-checkbox {
+    accent-color: #ef4444 !important;
+}
+
+/* ── REQUIRED state (field locked, cannot be hidden) ── */
+.coderembassy-field-list label.coderembassy-field-item.ceec-field--required {
+    background: rgba(37,99,235,.04) !important;
+    border-color: rgba(37,99,235,.22) !important;
+    cursor: grab !important;
+}
+
+/* ── Dot-grid drag grip ── */
+.ceec-field-grip {
+    flex-shrink: 0;
+    display: inline-block;
+    width: 10px;
+    height: 16px;
+    background-image:
+        radial-gradient(circle, #94a3b8 1.3px, transparent 1.3px),
+        radial-gradient(circle, #94a3b8 1.3px, transparent 1.3px);
+    background-size: 5px 6px;
+    background-position: 0 0, 2.5px 3px;
+    background-repeat: repeat-y;
+    opacity: .45;
+    transition: opacity .13s;
+}
+
+.coderembassy-field-item:hover .ceec-field-grip {
+    opacity: .9;
+}
+
+/* ── Checkbox ── */
+.ceec-field-checkbox {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+    accent-color: var(--ceec-accent);
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* ── Field name text ── */
+.ceec-field-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--ceec-text);
+    line-height: 1.3;
+    transition: color .15s, text-decoration .15s;
+}
+
+/* ── Lock icon (required) ── */
+.ceec-field-lock {
+    flex-shrink: 0;
+    font-size: 11px !important;
+    width: 11px !important;
+    height: 11px !important;
+    color: var(--ceec-accent) !important;
+    opacity: .55;
+    margin-left: auto;
+}
+
+/* ── Legacy required badge (kept for compatibility) ── */
+.ceec-required-badge {
+    font-size: .65rem;
+    font-weight: 700;
+    color: var(--ceec-danger);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+
+/* Custom fields container */
+#coderembassy-custom-fields-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    margin: 0 0 10px !important;
+}
+
+.coderembassy-custom-field-row {
+    display: grid !important;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1.5fr auto !important;
+    gap: 7px !important;
+    align-items: center !important;
+    background: var(--ceec-muted) !important;
+    border: 1px solid var(--ceec-border) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    padding: 9px 11px !important;
+    margin-bottom: 0 !important;
+}
+
+.coderembassy-custom-field-row input[type="text"],
+.coderembassy-custom-field-row select {
+    height: 30px !important;
+    padding: 0 7px !important;
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    font-size: .79rem !important;
+    background: #fff !important;
+    color: var(--ceec-text) !important;
+    width: 100% !important;
+    transition: border-color .13s;
+}
+
+.coderembassy-custom-field-row input[type="text"]:focus,
+.coderembassy-custom-field-row select:focus {
+    border-color: var(--ceec-accent) !important;
+    box-shadow: 0 0 0 2px rgba(37,99,235,.1) !important;
+    outline: none !important;
+}
+
+.coderembassy-custom-field-row .remove-custom-field {
+    white-space: nowrap;
+    height: 30px !important;
+    padding: 0 9px !important;
+    border: 1.5px solid #fca5a5 !important;
+    background: #fef2f2 !important;
+    color: var(--ceec-danger) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    font-size: .77rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: background .13s;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.coderembassy-custom-field-row .remove-custom-field:hover {
+    background: #fee2e2 !important;
+    border-color: var(--ceec-danger) !important;
+}
+
+#add-custom-field {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    height: 32px !important;
+    padding: 0 12px !important;
+    background: #fff !important;
+    border: 1.5px dashed var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    color: var(--ceec-text2) !important;
+    font-size: .8rem !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    transition: border-color .13s, color .13s;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+#add-custom-field:hover {
+    border-color: var(--ceec-accent) !important;
+    color: var(--ceec-accent) !important;
+}
+
+/* Template settings meta box inline row */
+.ceec-settings-row.ceec-meta-row {
+    padding: 12px 0 4px;
+    border: none;
+}
+
+/* ----------------------------------------------------------
    RESPONSIVE
 ---------------------------------------------------------- */
-@media (max-width: 860px) {
-    .coderembassy-admin-container { flex-direction: column !important; }
-    .coderembassy-admin-tabs { flex: none !important; position: static !important; width: 100% !important; }
-    .coderembassy-admin-tabs .coderembassy-tab-nav { flex-direction: row !important; overflow-x: auto; gap: 3px !important; }
-    .coderembassy-admin-tabs .coderembassy-tab-link { white-space: nowrap; border-bottom: none !important; }
-    .ceec-settings-row { flex-direction: column; gap: 7px; }
-    .ceec-settings-row__label { flex: none; }
+@media (max-width: 960px) {
+    .ceec-pro-layout { flex-direction: column; }
+    .ceec-pro-sidebar { flex: none; width: 100%; }
+    .ceec-template-chips { flex-direction: row; flex-wrap: wrap; }
+    .ceec-template-chip { flex: 0 0 auto; }
+}
+
+@media (max-width: 700px) {
+    .coderembassy-custom-field-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .coderembassy-field-list {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+/* ==========================================================
+   PRO SETTINGS PAGE — Premium Redesign
+   ========================================================== */
+
+/* ── Page Wrap ── */
+.ceec-pro-admin-wrap {
+    margin: 15px 22px 0 22px !important;
+}
+
+/* ── Save notice (toast) ── */
+.ceec-notice-success {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: linear-gradient(135deg, #dcfce7, #d1fae5);
+    border: 1px solid #86efac;
+    border-left: 4px solid #22c55e;
+    border-radius: var(--ceec-r-sm);
+    padding: 11px 16px;
+    margin: 10px 0 16px;
+    font-size: .84rem;
+    font-weight: 600;
+    color: #15803d;
+    transition: opacity .35s ease, transform .35s ease;
+}
+.ceec-notice-success .dashicons {
+    color: #22c55e;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+/* ── Hero Header ── */
+.ceec-pro-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4338ca 100%);
+    border-radius: var(--ceec-r);
+    padding: 38px 30px;
+    margin: 12px 0 20px;
+    box-shadow: 0 4px 24px rgba(67,56,202,.28), 0 1px 4px rgba(0,0,0,.12);
+    position: relative;
+    overflow: hidden;
+}
+.ceec-pro-page-header::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    pointer-events: none;
+}
+.ceec-pro-page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: 30%;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.04);
+    pointer-events: none;
+}
+.ceec-pro-page-header__left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+}
+.ceec-pro-page-header__icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    backdrop-filter: blur(4px);
+}
+.ceec-pro-page-header__icon .dashicons {
+    color: #fff;
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+}
+.ceec-pro-page-header__text h1 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    line-height: 1.15 !important;
+    text-shadow: 0 1px 4px rgba(0,0,0,.18);
+    border-bottom: none !important;
+}
+.ceec-pro-page-header__text p {
+    margin: 4px 0 0 !important;
+    font-size: .82rem;
+    color: rgba(255,255,255,.72);
+}
+.ceec-pro-page-header__badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+.ceec-version-tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px;
+    color: rgba(255,255,255,.85);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    padding: 3px 10px;
+}
+.ceec-version-tag--pro {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    border: none !important;
+}
+.ceec-version-tag--ver {
+    background: rgba(255,255,255,.15) !important;
+}
+
+/* ── Settings Layout ── */
+.ceec-pro-settings-layout {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+.ceec-pro-settings-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.ceec-pro-settings-sidebar {
+    flex: 0 0 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ── Card Component ── */
+.ceec-pro-card {
+    background: #fff;
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r);
+    box-shadow: var(--ceec-shadow-s);
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+.ceec-pro-card:last-child { margin-bottom: 0; }
+
+.ceec-pro-card__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--ceec-muted);
+    border-bottom: 1px solid var(--ceec-border);
+}
+.ceec-pro-card__header--accent {
+    background: linear-gradient(to right, #f8fafc, #eff6ff);
+}
+.ceec-pro-card__header-icon {
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid var(--ceec-border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ceec-accent);
+}
+.ceec-pro-card__header h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: .94rem !important;
+    font-weight: 700 !important;
+    color: var(--ceec-text) !important;
+    border-bottom: none !important;
+}
+.ceec-pro-card__header p {
+    margin: 2px 0 0 !important;
+    font-size: .76rem;
+    color: var(--ceec-text2);
+}
+
+.ceec-pro-card__body { padding: 20px; }
+
+/* ── Save Card ── */
+.ceec-save-card .ceec-pro-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ceec-save-btn {
+    width: 100%;
+    height: 42px;
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--ceec-r-sm);
+    font-size: .9rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 12px rgba(67,56,202,.2);
+}
+.ceec-save-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(67,56,202,.3);
+}
+.ceec-save-hint {
+    margin: 0;
+    font-size: .75rem;
+    color: var(--ceec-text3);
+    text-align: center;
+}
+    background: #fff;
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r);
+    box-shadow: var(--ceec-shadow-s);
+    overflow: hidden;
+}
+.ceec-pro-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--ceec-border);
+    background: var(--ceec-muted);
+}
+.ceec-pro-card__header--accent {
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    border-bottom-color: #c4b5fd;
+}
+.ceec-pro-card__header-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--ceec-accent-l);
+    border-radius: 8px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--ceec-accent) !important;
+    font-size: 17px !important;
+    line-height: 34px !important;
+    text-align: center;
+}
+.ceec-pro-card__header--accent .ceec-pro-card__header-icon {
+    background: rgba(109,40,217,.12);
+    color: #6d28d9 !important;
+}
+.ceec-pro-card__header h2 {
+    margin: 0 0 2px !important;
+    padding: 0 !important;
+    font-size: .92rem !important;
+    font-weight: 700 !important;
+    color: var(--ceec-text) !important;
+    border-bottom: none !important;
+}
+.ceec-pro-card__header p {
+    margin: 0 !important;
+    font-size: .76rem;
+    color: var(--ceec-text2);
+    line-height: 1.4;
+}
+.ceec-pro-card__body {
+    padding: 18px 20px;
+}
+
+/* ── Template Grid ── */
+.ceec-template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.ceec-tpl-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 2px solid var(--ceec-border);
+    border-radius: var(--ceec-r);
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .18s, box-shadow .18s, transform .15s;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+}
+.ceec-tpl-card:hover {
+    border-color: var(--ceec-accent);
+    box-shadow: 0 4px 16px rgba(37,99,235,.12);
+    transform: translateY(-2px);
+}
+.ceec-tpl-card--active {
+    border-color: var(--ceec-accent) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12), 0 4px 16px rgba(37,99,235,.1) !important;
+}
+.ceec-tpl-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.ceec-tpl-card__preview {
+    width: 100%;
+    height: 80px;
+    background: var(--ceec-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--ceec-border);
+}
+.ceec-tpl-card__preview .dashicons {
+    font-size: 34px;
+    width: 34px;
+    height: 34px;
+    color: var(--tpl-color, var(--ceec-accent));
+    opacity: .8;
+}
+.ceec-tpl-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 11px 13px 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.ceec-tpl-card__name {
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--ceec-text);
+    line-height: 1.2;
+}
+.ceec-tpl-card__desc {
+    font-size: .74rem;
+    color: var(--ceec-text2);
+    line-height: 1.4;
+}
+.ceec-tpl-card__check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    background: var(--ceec-accent);
+    border-radius: 50%;
+    color: #fff !important;
+    font-size: 14px !important;
+    line-height: 22px !important;
+    text-align: center;
+    opacity: 0;
+    transform: scale(.5);
+    transition: opacity .2s, transform .2s;
+}
+.ceec-tpl-card--active .ceec-tpl-card__check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ── Pro Tip ── */
+.ceec-pro-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--ceec-r-sm);
+    padding: 10px 13px;
+    font-size: .78rem;
+    color: #1e40af;
+    line-height: 1.5;
+}
+.ceec-pro-tip .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #3b82f6;
+    margin-top: 1px;
+}
+
+/* ── Save Button ── */
+.ceec-save-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    border: none !important;
+    border-radius: var(--ceec-r-sm) !important;
+    color: #fff !important;
+    font-size: .875rem !important;
+    font-weight: 700 !important;
+    cursor: pointer;
+    transition: opacity .17s, transform .15s, box-shadow .17s;
+    box-shadow: 0 3px 12px rgba(79,70,229,.35) !important;
+    text-shadow: none !important;
+    letter-spacing: .02em;
+}
+.ceec-save-btn:hover {
+    opacity: .92;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(79,70,229,.4) !important;
+}
+.ceec-save-btn:active { transform: translateY(0); }
+.ceec-save-btn .dashicons {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+}
+.ceec-save-hint {
+    margin: 9px 0 0 !important;
+    font-size: .74rem !important;
+    color: var(--ceec-text3) !important;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* ── Active Template Display ── */
+.ceec-active-tpl-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 13px;
+    background: var(--ceec-muted);
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r-sm);
+}
+.ceec-active-tpl-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background .25s;
+}
+.ceec-active-tpl-name {
+    font-size: .83rem;
+    font-weight: 600;
+    color: var(--ceec-text);
+}
+
+/* ── Quick Links ── */
+.ceec-quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 14px !important;
+}
+.ceec-quick-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: var(--ceec-r-sm);
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--ceec-text2);
+    text-decoration: none !important;
+    transition: background .14s, color .14s;
+}
+.ceec-quick-link:hover {
+    background: var(--ceec-accent-l);
+    color: var(--ceec-accent) !important;
+}
+.ceec-quick-link .dashicons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: var(--ceec-text3);
+    transition: color .14s;
+}
+.ceec-quick-link:hover .dashicons { color: var(--ceec-accent); }
+
+/* ── Pro Settings Responsive ── */
+@media (max-width: 900px) {
+    .ceec-pro-settings-layout { flex-direction: column; }
+    .ceec-pro-settings-sidebar { flex: none; width: 100%; }
+    .ceec-template-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+@media (max-width: 600px) {
+    .ceec-pro-page-header { flex-direction: column; align-items: flex-start; }
+    .ceec-template-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ==========================================================
+   SELECT2 — Premium Override
+   Overrides both the bundled select2.min.css and the free
+   plugin's admin.css Select2 rules for a polished look.
+   ========================================================== */
+
+/* ── Container ── */
+.select2-container {
+    width: 100% !important;
+}
+
+/* ── Multi-select box ── */
+.select2-container--default .select2-selection--multiple {
+    background: #fff !important;
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    min-height: 42px !important;
+    padding: 4px 6px 2px !important;
+    box-shadow: none !important;
+    transition: border-color .14s, box-shadow .14s;
+    cursor: text;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--ceec-accent) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.11) !important;
+    outline: none !important;
+}
+
+/* ── Selected tag / chip ── */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    background: linear-gradient(135deg, #4f46e5, #6d28d9) !important;
+    border: none !important;
+    border-radius: 999px !important;
+    color: #fff !important;
+    font-size: .75rem !important;
+    font-weight: 600 !important;
+    padding: 3px 10px 3px 6px !important;
+    margin: 3px 4px 3px 0 !important;
+    box-shadow: 0 1px 4px rgba(79,70,229,.30) !important;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    line-height: 1.5 !important;
+    transition: box-shadow .13s, opacity .13s;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice:hover {
+    opacity: .88;
+    box-shadow: 0 2px 8px rgba(79,70,229,.38) !important;
+}
+
+/* ── Tag label text ── */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    color: #fff !important;
+    padding-left: 2px !important;
+    padding-right: 4px !important;
+    font-size: .75rem !important;
+}
+
+/* ── Remove (×) button inside tag ── */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    background: transparent !important;
+    border: none !important;
+    border-right: none !important;
+    color: rgba(255,255,255,.75) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    padding: 0 3px 0 0 !important;
+    cursor: pointer;
+    transition: color .12s;
+    order: 1; /* put × after label text */
+    border-radius: 0 !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    height: auto !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #fecaca !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* ── Inline search field ── */
+.select2-container--default .select2-search--inline .select2-search__field {
+    font-size: .82rem !important;
+    color: var(--ceec-text) !important;
+    margin-top: 4px !important;
+    margin-left: 4px !important;
+}
+
+.select2-container--default .select2-search--inline .select2-search__field::placeholder {
+    color: var(--ceec-text3) !important;
+}
+
+/* ── Dropdown panel ── */
+.select2-container--default .select2-dropdown {
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06) !important;
+    overflow: hidden;
+}
+
+.select2-container--default.select2-container--open.select2-container--below .select2-selection--multiple {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.select2-container--default .select2-dropdown--below {
+    border-top: none !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    margin-top: -2px;
+}
+
+/* ── Dropdown search input ── */
+.select2-container--default .select2-search--dropdown {
+    padding: 8px 10px 6px !important;
+    border-bottom: 1px solid var(--ceec-border) !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    padding: 6px 10px !important;
+    font-size: .82rem !important;
+    color: var(--ceec-text) !important;
+    background: #fff !important;
+    outline: none !important;
+    transition: border-color .13s, box-shadow .13s;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: var(--ceec-accent) !important;
+    box-shadow: 0 0 0 2px rgba(37,99,235,.10) !important;
+}
+
+/* ── Result items ── */
+.select2-container--default .select2-results__option {
+    padding: 8px 13px !important;
+    font-size: .82rem !important;
+    color: var(--ceec-text) !important;
+    background: #fff !important;
+    transition: background .1s;
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background: var(--ceec-accent) !important;
+    color: #fff !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background: var(--ceec-accent-l) !important;
+    color: var(--ceec-accent) !important;
+    font-weight: 600;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true]:hover,
+.select2-container--default .select2-results__option--highlighted[aria-selected=true] {
+    background: var(--ceec-accent) !important;
+    color: #fff !important;
+}
+
+/* ── Loading / empty states ── */
+.select2-container--default .select2-results__option--loading,
+.select2-container--default .select2-results__message {
+    color: var(--ceec-text3) !important;
+    font-size: .8rem !important;
+    font-style: italic;
+    padding: 10px 13px !important;
+}
+
+/* ==========================================================
+   META BOXES — Premium Redesign
+   ========================================================== */
+
+/* ── Postbox container overrides for our 3 Pro meta boxes ── */
+#coderembassy_pro_template_settings.postbox,
+#coderembassy_pro_field_settings.postbox,
+#coderembassy_pro_display_settings.postbox {
+    border: 1px solid var(--ceec-border) !important;
+    border-radius: var(--ceec-r) !important;
+    box-shadow: var(--ceec-shadow-s) !important;
+    overflow: hidden;
+}
+
+#coderembassy_pro_template_settings .postbox-header,
+#coderembassy_pro_field_settings .postbox-header,
+#coderembassy_pro_display_settings .postbox-header {
+    background: var(--ceec-muted) !important;
+    border-bottom: 1px solid var(--ceec-border) !important;
+    border-radius: 0 !important;
+}
+
+#coderembassy_pro_template_settings .postbox-header h2,
+#coderembassy_pro_field_settings .postbox-header h2,
+#coderembassy_pro_display_settings .postbox-header h2 {
+    font-size: .88rem !important;
+    font-weight: 700 !important;
+    color: var(--ceec-text) !important;
+}
+
+/* ── Template Intro text ── */
+.ceec-meta-tpl-intro {
+    font-size: .8rem;
+    color: var(--ceec-text2);
+    margin: 0 0 14px;
+    line-height: 1.5;
+}
+
+/* ── Template card grid — compact variant for meta boxes ── */
+.ceec-template-grid--meta {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)) !important;
+    gap: 9px !important;
+    margin-bottom: 0 !important;
+}
+
+.ceec-template-grid--meta .ceec-tpl-card__preview {
+    height: 64px !important;
+}
+
+.ceec-template-grid--meta .ceec-tpl-card__preview .dashicons {
+    font-size: 26px !important;
+    width: 26px !important;
+    height: 26px !important;
+}
+
+.ceec-template-grid--meta .ceec-tpl-card__body {
+    padding: 8px 10px 9px !important;
+}
+
+.ceec-template-grid--meta .ceec-tpl-card__name {
+    font-size: .79rem !important;
+}
+
+.ceec-template-grid--meta .ceec-tpl-card__desc {
+    font-size: .7rem !important;
+}
+
+/* ── Display settings card body (bordered rows) ── */
+.ceec-meta-settings-body {
+    margin: -2px -12px -12px;
+}
+
+.ceec-meta-settings-body .ceec-settings-row {
+    padding: 12px 18px !important;
+    border-bottom: 1px solid var(--ceec-border) !important;
+    gap: 16px !important;
+}
+
+.ceec-meta-settings-body .ceec-settings-row:last-of-type {
+    border-bottom: none !important;
+}
+
+/* ── Row icon pill in display settings ── */
+.ceec-meta-row-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--ceec-accent-l);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 5px;
+}
+
+.ceec-meta-row-icon .dashicons {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+    color: var(--ceec-accent) !important;
+}
+
+/* ── Thumbnail size inputs ── */
+.ceec-thumb-size-inputs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ceec-thumb-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-weight: normal !important;
+}
+
+.ceec-thumb-dim {
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--ceec-text2);
+    min-width: 14px;
+}
+
+.ceec-thumb-label input[type="number"] {
+    width: 80px !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    border: 1.5px solid var(--ceec-border2) !important;
+    border-radius: var(--ceec-r-sm) !important;
+    font-size: .82rem !important;
+    color: var(--ceec-text) !important;
+    background: #fff !important;
+    transition: border-color .13s;
+}
+
+.ceec-thumb-label input[type="number"]:focus {
+    border-color: var(--ceec-accent) !important;
+    box-shadow: 0 0 0 2px rgba(37,99,235,.10) !important;
+    outline: none !important;
+}
+
+.ceec-thumb-unit {
+    font-size: .74rem;
+    color: var(--ceec-text3);
+}
+
+/* ── Drag hint in field settings ── */
+.ceec-drag-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .76rem;
+    color: var(--ceec-text3);
+    background: var(--ceec-muted);
+    border: 1px solid var(--ceec-border);
+    border-radius: var(--ceec-r-sm);
+    padding: 4px 10px;
+    margin-bottom: 10px;
+}
+
+/* ── Field settings: ensure description is styled properly ── */
+.coderembassy-pro-field-settings .ceec-meta-desc {
+    font-size: .79rem;
+    color: var(--ceec-text2);
+    line-height: 1.5;
+    margin: 0 0 12px;
+}
+
+/* ── Responsive for meta template grid ── */
+@media (max-width: 800px) {
+    .ceec-template-grid--meta {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    }
+}
+@media (max-width: 500px) {
+    .ceec-template-grid--meta {
+        grid-template-columns: 1fr 1fr 1fr !important;
+    }
+    .ceec-meta-settings-body .ceec-settings-row {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    .ceec-meta-settings-body .ceec-settings-row__label {
+        flex: none !important;
+    }
+}
+/* ── Hero form refinements (for free version cards) ── */
+.ceec-hero-form .form-table { margin: 0; }
+.ceec-hero-form .form-table th { 
+    padding: 12px 10px 12px 0; 
+    width: 200px; 
+    font-size: .83rem;
+    font-weight: 600;
+    color: var(--ceec-text);
+}
+.ceec-hero-form .form-table td { padding: 10px 0; }
+.ceec-hero-form-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--ceec-border);
+}
+.ceec-hero-form-footer .submit { padding: 0; margin: 0; }
+
+/* ── Upgrade Card (Free only) ── */
+.ceec-upgrade-card {
+    background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+    border: 1px solid #bfdbfe;
+    text-align: center;
+}
+.ceec-upgrade-icon {
+    width: 44px;
+    height: 44px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    box-shadow: 0 4px 10px rgba(37,99,235,.15);
+}
+.ceec-upgrade-icon .dashicons {
+    color: #f59e0b;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+.ceec-upgrade-card h3 {
+    margin: 0 0 6px !important;
+    font-size: .95rem !important;
+    font-weight: 700 !important;
+    color: #1e3a8a !important;
+}
+.ceec-upgrade-card p {
+    font-size: .78rem;
+    color: #3b82f6;
+    margin: 0 0 16px !important;
+    line-height: 1.45;
+}
+.ceec-upgrade-btn {
+    display: inline-block;
+    background: #2563eb;
+    color: #fff !important;
+    text-decoration: none !important;
+    padding: 8px 18px;
+    border-radius: var(--ceec-r-sm);
+    font-size: .82rem;
+    font-weight: 600;
+    transition: background .15s;
+}
+.ceec-upgrade-btn:hover {
+    background: #1d4ed8;
+}
+
+/* Hide default WP section headers inside our hero form to avoid double titles */
+.ceec-hero-form h2, .ceec-hero-form h3 { display: none !important; }
+
+@media (max-width: 782px) {
+    .ceec-hero-form .form-table th { width: auto; padding-bottom: 0; }
+}
+
+/* ── Shortcode List Page Banner ── */
+.ceec-pro-list-page .ceec-pro-list-header-wrap {
+    margin: 0 -20px 20px -20px;
+    width: calc(100% + 40px);
+    max-width: none;
+    clear: both;
+}
+
+/* ── Configuration Page Header Full Width ── */
+.ceec-pro-config-wrap .ceec-pro-page-header {
+    margin: 0 -20px 20px -20px;
+    width: calc(100% + 40px);
+    max-width: none;
+    border-radius: 0;
+}
+
+.ceec-pro-list-page .wrap > h1.wp-heading-inline,
+.ceec-pro-list-page .wrap > .page-title-action,
+.ceec-pro-list-page .wrap > hr {
+    display: none !important;
+}
+
+.ceec-pro-list-page .ceec-pro-page-header {
+    border-radius: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    padding: 14px 30px !important;
+    min-height: auto !important;
+}
+
+.ceec-pro-list-page .ceec-pro-page-header__icon {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 19px !important;
+    background: rgba(255,255,255,.15) !important;
+}
+
+.ceec-pro-list-page .ceec-pro-page-header__text h1 {
+    font-size: 1.2rem !important;
+    margin-bottom: 2px !important;
+}
+
+.ceec-pro-list-page .ceec-pro-page-header__text p {
+    font-size: .8rem !important;
+    opacity: .9;
+}
+
+.ceec-pro-list-page .subsubsub {
+    margin: 15px 0 15px 5px !important;
+}
+
+.ceec-pro-header-actions {
+    margin-left: 25px;
+}
+
+.ceec-pro-header-actions .ceec-save-btn {
+    width: auto !important;
+    padding: 0 22px !important;
+    height: 38px !important;
+    font-size: .82rem !important;
+    text-decoration: none !important;
+    white-space: nowrap;
 }
