@@ -708,6 +708,18 @@
     margin-top: 15px;
     margin-bottom: 10px;
 }
+
+/* Hide standard WordPress notices on Express Checkout pages to maintain clean UI */
+body.ceec-pro-list-page .notice:not(.ceec-custom-notice),
+body.ceec-pro-list-page .updated,
+body.ceec-pro-list-page .error,
+body.ceec-pro-list-page .notice-success,
+body.ceec-pro-list-page .notice-info,
+body.ceec-pro-list-page .notice-warning,
+body.ceec-pro-list-page .notice-error {
+    display: none !important;
+}
+
 /* ── Logo + content row ── */
 .ceec-banner-logo {
     display: flex;
