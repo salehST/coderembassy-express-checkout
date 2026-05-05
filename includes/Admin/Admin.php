@@ -187,7 +187,7 @@ class Admin
     {
         $options = get_option('coderembassy_global_options', array());
         $value = isset($options['pro_theme_compatibility_css']) ? $options['pro_theme_compatibility_css'] : '0';
-        ?>
+    ?>
         <input type="checkbox" id="coderembassy_pro_theme_compatibility_css" name="coderembassy_global_options[pro_theme_compatibility_css]" value="1" <?php checked($value, '1'); ?> />
         <label for="coderembassy_pro_theme_compatibility_css"><?php esc_html_e('Enable compatibility CSS for pro themes (WoodMart, Avada, etc.)', 'coderembassy-express-checkout'); ?></label>
         <p class="description"><?php esc_html_e('Only enable this if the product cards or checkout form layout look broken with your theme. Leave unchecked for free themes (e.g. Astra) to avoid overriding their design.', 'coderembassy-express-checkout'); ?></p>
@@ -201,17 +201,23 @@ class Admin
      */
     public function configuration_page()
     {
-        ?>
+    ?>
         <div class="wrap ceec-pro-admin-wrap ceec-pro-config-wrap">
             <!-- Premium Header -->
             <div class="ceec-pro-page-header">
-                <div class="ceec-pro-page-header__left">
-                    <div class="ceec-pro-page-header__icon">
-                        <span class="dashicons dashicons-admin-generic"></span>
-                    </div>
-                    <div class="ceec-pro-page-header__text">
-                        <h1><?php esc_html_e( 'Configuration', 'coderembassy-express-checkout' ); ?></h1>
-                        <p><?php esc_html_e( 'Configure global defaults and display settings for your express checkout.', 'coderembassy-express-checkout' ); ?></p>
+                <!-- Embassy Logo Strip -->
+                <div class="ceec-banner-logo">
+                    <img src="<?php echo esc_url(plugins_url('assets/images/logo.png', dirname(__DIR__))); ?>" alt="CoderEmbassy" height="42">
+                </div>
+                <div class="ceec-pro-page-header__content">
+                    <div class="ceec-pro-page-header__left">
+                        <div class="ceec-pro-page-header__icon">
+                            <span class="dashicons dashicons-admin-generic"></span>
+                        </div>
+                        <div class="ceec-pro-page-header__text">
+                            <h1><?php esc_html_e('Configuration', 'coderembassy-express-checkout'); ?></h1>
+                            <p><?php esc_html_e('Configure global defaults and display settings for your express checkout.', 'coderembassy-express-checkout'); ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,7 +231,7 @@ class Admin
                 <div class="ceec-pro-settings-layout">
                     <!-- Main Column -->
                     <div class="ceec-pro-settings-main">
-                        
+
                         <!-- Card: Global Settings -->
                         <div class="ceec-pro-card">
                             <div class="ceec-pro-card__header ceec-pro-card__header--accent">
@@ -233,8 +239,8 @@ class Admin
                                     <span class="dashicons dashicons-admin-settings"></span>
                                 </div>
                                 <div>
-                                    <h2><?php esc_html_e( 'Global Settings', 'coderembassy-express-checkout' ); ?></h2>
-                                    <p><?php esc_html_e( 'Core behavior settings for all shortcodes.', 'coderembassy-express-checkout' ); ?></p>
+                                    <h2><?php esc_html_e('Global Settings', 'coderembassy-express-checkout'); ?></h2>
+                                    <p><?php esc_html_e('Core behavior settings for all shortcodes.', 'coderembassy-express-checkout'); ?></p>
                                 </div>
                             </div>
                             <div class="ceec-pro-card__body">
@@ -251,8 +257,8 @@ class Admin
                                     <span class="dashicons dashicons-admin-appearance"></span>
                                 </div>
                                 <div>
-                                    <h2><?php esc_html_e( 'Global Design Settings', 'coderembassy-express-checkout' ); ?></h2>
-                                    <p><?php esc_html_e( 'Visual and layout defaults for all products.', 'coderembassy-express-checkout' ); ?></p>
+                                    <h2><?php esc_html_e('Global Design Settings', 'coderembassy-express-checkout'); ?></h2>
+                                    <p><?php esc_html_e('Visual and layout defaults for all products.', 'coderembassy-express-checkout'); ?></p>
                                 </div>
                             </div>
                             <div class="ceec-pro-card__body">
@@ -265,8 +271,8 @@ class Admin
                         <!-- Floating Save Bar (Premium Style) -->
                         <div class="ceec-pro-card ceec-save-card">
                             <div class="ceec-pro-card__body">
-                                <?php submit_button( __( 'Save All Settings', 'coderembassy-express-checkout' ), 'primary', 'submit', false ); ?>
-                                <p class="ceec-save-hint"><?php esc_html_e( 'Settings will be applied to all shortcodes immediately.', 'coderembassy-express-checkout' ); ?></p>
+                                <?php submit_button(__('Save All Settings', 'coderembassy-express-checkout'), 'primary', 'submit', false); ?>
+                                <p class="ceec-save-hint"><?php esc_html_e('Settings will be applied to all shortcodes immediately.', 'coderembassy-express-checkout'); ?></p>
                             </div>
                         </div>
                     </div>
@@ -275,47 +281,48 @@ class Admin
                     <div class="ceec-pro-settings-sidebar">
                         <div class="ceec-pro-card">
                             <div class="ceec-pro-card__header">
-                                <h2><?php esc_html_e( 'Quick Links', 'coderembassy-express-checkout' ); ?></h2>
+                                <h2><?php esc_html_e('Quick Links', 'coderembassy-express-checkout'); ?></h2>
                             </div>
                             <div class="ceec-pro-card__body ceec-quick-links">
-                                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=coderembassy_ec' ) ); ?>" class="ceec-quick-link">
-                                    <span class="dashicons dashicons-list-view"></span> <?php esc_html_e( 'Manage Shortcodes', 'coderembassy-express-checkout' ); ?>
+                                <a href="<?php echo esc_url(admin_url('edit.php?post_type=coderembassy_ec')); ?>" class="ceec-quick-link">
+                                    <span class="dashicons dashicons-list-view"></span> <?php esc_html_e('Manage Shortcodes', 'coderembassy-express-checkout'); ?>
                                 </a>
                                 <a href="https://coderembassy.com/docs" target="_blank" class="ceec-quick-link">
-                                    <span class="dashicons dashicons-editor-help"></span> <?php esc_html_e( 'Documentation', 'coderembassy-express-checkout' ); ?>
+                                    <span class="dashicons dashicons-editor-help"></span> <?php esc_html_e('Documentation', 'coderembassy-express-checkout'); ?>
                                 </a>
                                 <a href="https://coderembassy.com/support" target="_blank" class="ceec-quick-link">
-                                    <span class="dashicons dashicons-format-chat"></span> <?php esc_html_e( 'Get Support', 'coderembassy-express-checkout' ); ?>
+                                    <span class="dashicons dashicons-format-chat"></span> <?php esc_html_e('Get Support', 'coderembassy-express-checkout'); ?>
                                 </a>
                             </div>
                         </div>
 
-                        <?php if ( ! defined('CODEREMBASSY_EXPRESS_CHECKOUT_PRO_VERSION') ) : ?>
-                        <div class="ceec-pro-card ceec-upgrade-card">
-                            <div class="ceec-pro-card__body">
-                                <div class="ceec-upgrade-icon"><span class="dashicons dashicons-star-filled"></span></div>
-                                <h3><?php esc_html_e( 'Upgrade to Pro', 'coderembassy-express-checkout' ); ?></h3>
-                                <p><?php esc_html_e( 'Get premium templates, variation styles, custom image sizes, and priority support.', 'coderembassy-express-checkout' ); ?></p>
-                                <a href="https://coderembassy.com/pro" target="_blank" class="ceec-upgrade-btn">
-                                    <?php esc_html_e( 'Go Pro Now', 'coderembassy-express-checkout' ); ?>
-                                </a>
+                        <?php if (! defined('CODEREMBASSY_EXPRESS_CHECKOUT_PRO_VERSION')) : ?>
+                            <div class="ceec-pro-card ceec-upgrade-card">
+                                <div class="ceec-pro-card__body">
+                                    <div class="ceec-upgrade-icon"><span class="dashicons dashicons-star-filled"></span></div>
+                                    <h3><?php esc_html_e('Upgrade to Pro', 'coderembassy-express-checkout'); ?></h3>
+                                    <p><?php esc_html_e('Get premium templates, variation styles, custom image sizes, and priority support.', 'coderembassy-express-checkout'); ?></p>
+                                    <a href="https://coderembassy.com/pro" target="_blank" class="ceec-upgrade-btn">
+                                        <?php esc_html_e('Go Pro Now', 'coderembassy-express-checkout'); ?>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
                         <?php endif; ?>
                     </div>
                 </div>
             </form>
         </div>
-        <?php
+    <?php
     }
 
     /**
      * Add admin body class
      * @since 1.0.0
      */
-    public function add_admin_body_class($classes) {
+    public function add_admin_body_class($classes)
+    {
         $screen = get_current_screen();
-        if ( isset($screen->id) && in_array($screen->id, array('edit-coderembassy_ec', 'coderembassy_ec')) ) {
+        if (isset($screen->id) && in_array($screen->id, array('edit-coderembassy_ec', 'coderembassy_ec'))) {
             $classes .= ' ceec-pro-list-page ';
         }
         return $classes;
@@ -325,9 +332,14 @@ class Admin
      * Add list page banner
      * @since 1.0.0
      */
-    public function add_list_page_banner() {
+    public function add_list_page_banner()
+    {
+        if (defined('CODEREMBASSY_EXPRESS_CHECKOUT_PRO_VERSION')) {
+            return;
+        }
+
         $screen = get_current_screen();
-        if ( !isset($screen->id) || !in_array($screen->id, array('edit-coderembassy_ec', 'coderembassy_ec')) ) {
+        if (!isset($screen->id) || !in_array($screen->id, array('edit-coderembassy_ec', 'coderembassy_ec'))) {
             return;
         }
 
@@ -335,42 +347,48 @@ class Admin
 
         $is_edit_screen = ($screen->id === 'coderembassy_ec');
         $is_add_new     = $is_edit_screen && (!isset($_GET['post']) || empty($_GET['post']));
-        
-        $title = $is_edit_screen ? ( $is_add_new ? __('Add New Shortcode', 'coderembassy-express-checkout') : __('Edit Shortcode', 'coderembassy-express-checkout') ) : __('Express Checkout Shortcodes', 'coderembassy-express-checkout');
+
+        $title = $is_edit_screen ? ($is_add_new ? __('Add New Shortcode', 'coderembassy-express-checkout') : __('Edit Shortcode', 'coderembassy-express-checkout')) : __('Express Checkout Shortcodes', 'coderembassy-express-checkout');
         $desc  = $is_edit_screen ? __('Configure your express checkout settings below.', 'coderembassy-express-checkout') : __('Manage your express checkout instances and copy shortcodes to your pages.', 'coderembassy-express-checkout');
         $icon  = $is_edit_screen ? 'dashicons-edit' : 'dashicons-list-view';
 
-        ?>
+    ?>
         <div class="ceec-pro-list-header-wrap">
             <div class="ceec-pro-page-header">
-                <div class="ceec-pro-page-header__left">
-                    <div class="ceec-pro-page-header__icon">
-                        <span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
-                    </div>
-                    <div class="ceec-pro-page-header__text">
-                        <h1><?php echo esc_html( $title ); ?></h1>
-                        <p><?php echo esc_html( $desc ); ?></p>
-                    </div>
+                <!-- Embassy Logo Strip -->
+                <div class="ceec-banner-logo">
+                    <img src="<?php echo esc_url(plugins_url('assets/images/logo.png', dirname(__DIR__))); ?>" alt="CoderEmbassy" height="42">
                 </div>
-                
-                <div class="ceec-pro-page-header__right">
-                    <div class="ceec-pro-page-header__badges">
-                        <?php if ($is_pro) : ?>
-                            <span class="ceec-version-tag ceec-version-tag--pro">PRO</span>
+                <div class="ceec-pro-page-header__content">
+                    <div class="ceec-pro-page-header__left">
+                        <div class="ceec-pro-page-header__icon">
+                            <span class="dashicons <?php echo esc_attr($icon); ?>"></span>
+                        </div>
+                        <div class="ceec-pro-page-header__text">
+                            <h1><?php echo esc_html($title); ?></h1>
+                            <p><?php echo esc_html($desc); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="ceec-pro-page-header__right">
+                        <div class="ceec-pro-page-header__badges">
+                            <?php if ($is_pro) : ?>
+                                <span class="ceec-version-tag ceec-version-tag--pro">PRO</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if (!$is_add_new) : ?>
+                            <div class="ceec-pro-header-actions">
+                                <a href="<?php echo esc_url(admin_url('post-new.php?post_type=coderembassy_ec')); ?>" class="ceec-save-btn">
+                                    <span class="dashicons dashicons-plus"></span> <?php esc_html_e('Add New Shortcode', 'coderembassy-express-checkout'); ?>
+                                </a>
+                            </div>
                         <?php endif; ?>
                     </div>
-                    
-                    <?php if ( !$is_add_new ) : ?>
-                    <div class="ceec-pro-header-actions">
-                        <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=coderembassy_ec' ) ); ?>" class="ceec-save-btn">
-                            <span class="dashicons dashicons-plus"></span> <?php esc_html_e( 'Add New Shortcode', 'coderembassy-express-checkout' ); ?>
-                        </a>
-                    </div>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
-        <?php
+<?php
     }
 
 

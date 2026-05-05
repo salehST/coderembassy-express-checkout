@@ -689,17 +689,67 @@
 /* ── Hero Header ── */
 .ceec-pro-page-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 16px;
     background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4338ca 100%);
     border-radius: var(--ceec-r);
-    padding: 38px 30px;
-    margin: 12px 0 20px;
+    padding: 22px 30px 30px;
+    margin: 10px 0 20px;
     box-shadow: 0 4px 24px rgba(67,56,202,.28), 0 1px 4px rgba(0,0,0,.12);
     position: relative;
     overflow: hidden;
 }
+/* Ensure it fits nicely when used as a notice */
+.ceec-pro-list-header-wrap {
+    margin: 0 20px 0 0;
+    max-width: 100%;
+}
+.ceec-pro-list-header-wrap .ceec-pro-page-header {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+/* ── Logo + content row ── */
+.ceec-banner-logo {
+    display: flex;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    position: relative;
+    z-index: 1;
+}
+.ceec-banner-logo img {
+    display: block;
+    height: 42px;
+    width: auto;
+}
+.ceec-pro-page-header .ceec-pro-page-header__left,
+.ceec-pro-page-header .ceec-pro-page-header__right {
+    position: relative;
+    z-index: 1;
+}
+/* inner row (left + right badges/actions) */
+.ceec-pro-page-header__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+}
+.ceec-pro-page-header__content > .ceec-pro-page-header__left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+.ceec-pro-page-header__content > .ceec-pro-page-header__right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+
 .ceec-pro-page-header::before {
     content: '';
     position: absolute;

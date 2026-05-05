@@ -4,7 +4,7 @@ Tags: checkout, express checkout, one-click checkout, quick buy
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,13 @@ It’s tested with most popular WooCommerce themes and should work with any them
 3. Checkout popup / redirect example.
 
 == Changelog ==
+
+= 1.0.3 - 01-05-2026 =
+
+* Fix bug for default values of settings in admin page.
+* Fix CSS issue on admin page.
+* Compatible with Stripe Payment Gateway plugin.
+* Add banner at shortcode list  and configuration page.
 
 = 1.0.2 - 11-03-2026 =
 
